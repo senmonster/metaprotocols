@@ -80,10 +80,11 @@ function App() {
 			doc_modal.showModal();
 		} else {
 			const resUser = await _btcConnector.getUser();
-			console.log("user now", resUser);
+			// console.log("user now", resUser);
 			setUserInfo(resUser);
 			setConnected(true);
-			setProtocolEntity(await _btcConnector.use("protocol"));
+			console.log(await _btcConnector.use("metaprotocols"), "metaprotocols entity");
+			setProtocolEntity(await _btcConnector.use("metaprotocols"));
 			console.log("your btc address: ", _btcConnector.address);
 		}
 	};
@@ -93,14 +94,14 @@ function App() {
 	//   console.log('userinfo', userInfo);
 	//   console.log('protocolEntity', protocolEntity);
 	//   console.log('btcConnector', btcConnector);
-	//   console.log('protocolentity res', await btcConnector!.use('protocol'));
+	//   console.log('protocolentity res', await btcConnector!.use('metaprotocols'));
 	// };
 
 	return (
 		<div className="relative">
 			<Navbar onWalletConnectStart={onWalletConnectStart} onLogout={onLogout} />
 
-			<div className="container pt-[100px] bg-[black] text-white h-screen overflow-auto">
+			<div className="container pt-[100px] bg-[rgb(20, 20, 20)] text-white h-screen overflow-auto">
 				{/* <button
           className='btn btn-active btn-accent text-[blue] absolute top-18 left-2'
           onClick={handleTest}
@@ -108,10 +109,7 @@ function App() {
           Test Button
         </button> */}
 				<Routes>
-					<Route
-						path="/"
-						element={<Home onWalletConnectStart={onWalletConnectStart} />}
-					/>
+					<Route path="/" element={<Home />} />
 					<Route path="/protocol/:id" element={<Protocol />} />
 					<Route path="/protocol/:id/edit" element={<EditProtocol />} />
 				</Routes>

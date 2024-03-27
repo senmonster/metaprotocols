@@ -1,7 +1,5 @@
 import { Sparkle } from "lucide-react";
 import { useEffect } from "react";
-// import { useState } from "react";
-// import cls from "classnames";
 import ProtocolCard from "./ProtocolCard";
 import { fetchProtocols } from "../../api/protocol";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -10,13 +8,8 @@ import { useInView } from "react-intersection-observer";
 import { useAtomValue } from "jotai";
 import { protocolEntityAtom } from "../../store/protocol";
 import { isNil } from "ramda";
-// import { useCallback } from 'react';
-// // import { ProtocolItem } from '../../types';
-// import { useAtom } from 'jotai';
-// import { btcConnectorAtom } from '../../store/user';
-// import { protocolPinsAtom } from '../../store/protocol';
-// import { isNil } from 'ramda';
-
+import { temp_pins } from "../../utils/mockData";
+import "./styles.css";
 export type Pin = {
 	id: string;
 	number: number;
@@ -41,106 +34,14 @@ export type Pin = {
 	contentSummary: string;
 };
 
-// const ProtocolList = () => {
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [protocolPins, setProtocolPins] = useAtom(protocolPinsAtom);
-//   const protocolEntity = useAtomValue(protocolEntityAtom);
-//   const navigate = useNavigate();
-
-//   const [showNewProtocol, setShowNewProtocol] = useState(true);
-
-//   const fetchPins = useCallback(async () => {
-//     setIsLoading(true);
-//     await sleep(800);
-//     if (!isNil(protocolEntity)) {
-//       const _protocolPins = await protocolEntity!.getPins();
-//       setProtocolPins(_protocolPins);
-//       setIsLoading(false);
-//     }
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [protocolEntity]);
-
-//   // the useEffect is only there to call `fetchData` at the right time
-//   useEffect(() => {
-//     fetchPins()
-//       // make sure to catch any error
-//       .catch(console.error);
-//   }, [fetchPins]);
-
-//   const protocoles = protocolPins.map((pin, index) => {
-//     return (
-//       <ProtocolCard
-//         imgSeed={'seed' + index}
-//         key={pin.id}
-//         protocolItem={pin}
-//         onProtocolDetail={(txid) => navigate(`/protocol/${txid}`)}
-//       />
-//     );
-//   });
-
-//   return (
-//     <div>
-//       <div className='flex gap-2 items-center place-content-center mt-16'>
-//         <Sparkle className='text-main' />
-//         <div className="text-white text-[36px] font-['Impact']">
-//           {"What's New Today"}
-//         </div>
-//         <Sparkle className='text-main' />
-//       </div>
-
-//       <div className='text-white flex mx-auto border border-white w-fit rounded-full mt-8'>
-//         <div
-//           className={cls('btn w-[150px] h-[26px] cursor-pointer', {
-//             'btn-primary rounded-full': !showNewProtocol,
-//             'btn-outline border-none': showNewProtocol,
-//           })}
-//           onClick={() => setShowNewProtocol(false)}
-//         >
-//           Follow
-//         </div>
-//         <div
-//           className={cls('btn w-[150px] h-[26px] cursor-pointer', {
-//             'btn-primary rounded-full': showNewProtocol,
-//             'btn-outline border-none': !showNewProtocol,
-//           })}
-//           onClick={() => setShowNewProtocol(true)}
-//         >
-//           New
-//         </div>
-//       </div>
-
-//       {isLoading ? (
-//         <div className='flex items-center gap-2 justify-center h-[200px]'>
-//           <div>Protocol Feed is Coming</div>
-//           <span className='loading loading-bars loading-md grid text-white'></span>
-//         </div>
-//       ) : (
-//         <div className='flex flex-col gap-3 my-4'>{protocoles}</div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default ProtocolList;
-
 const ProtocolList = () => {
 	const navigate = useNavigate();
 	const { ref, inView } = useInView();
 
 	const protocolEntity = useAtomValue(protocolEntityAtom);
-	console.log("protocolEntity", !isNil(protocolEntity), protocolEntity);
-	// const [showNewProtocol, setShowNewProtocol] = useState(true);
 
-	const {
-		data,
-		isLoading,
-		// isFetching,
-		fetchNextPage,
-
-		isFetchingNextPage,
-		hasNextPage,
-	} = useInfiniteQuery({
-		queryKey: ["protocoles"],
+	const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } = useInfiniteQuery({
+		queryKey: ["metaprotocols"],
 		enabled: !isNil(protocolEntity),
 		refetchOnMount: "always",
 		refetchOnReconnect: "always",
@@ -153,17 +54,6 @@ const ProtocolList = () => {
 			return nextPage;
 		},
 	});
-	const protocoles = data?.pages.map((pins: Pin[] | null) =>
-		(pins ?? []).map((pin) => {
-			return (
-				<ProtocolCard
-					key={pin.id}
-					protocolItem={pin}
-					onProtocolDetail={(txid) => navigate(`/protocol/${txid}`)}
-				/>
-			);
-		})
-	);
 
 	useEffect(() => {
 		if (inView && hasNextPage) {
@@ -171,6 +61,31 @@ const ProtocolList = () => {
 			fetchNextPage();
 		}
 	}, [inView, hasNextPage, fetchNextPage]);
+
+	const protocoles = data?.pages.map((pins: Pin[] | null) =>
+		(pins ?? []).map((pin) => {
+			return (
+				<ProtocolCard
+					key={pin.id}
+					protocolItem={pin}
+					onProtocolDetail={() => navigate(`/protocol/${pin.id}`)}
+				/>
+			);
+		})
+	);
+
+	useEffect(() => {
+		document.getElementById("cards")!.onmousemove = (e) => {
+			for (const card of document.getElementsByClassName("card")) {
+				const rect = card.getBoundingClientRect(),
+					x = e.clientX - rect.left,
+					y = e.clientY - rect.top;
+
+				(card as HTMLElement).style.setProperty("--mouse-x", `${x}px`);
+				(card as HTMLElement).style.setProperty("--mouse-y", `${y}px`);
+			}
+		};
+	}, []);
 
 	return (
 		<div>
@@ -182,38 +97,19 @@ const ProtocolList = () => {
 				<Sparkle className="text-main" />
 			</div>
 
-			{/* <div className="text-white flex mx-auto border border-white w-fit rounded-full mt-8">
-				<div
-					className={cls("btn w-[150px] h-[26px] cursor-pointer", {
-						"btn-primary rounded-full": !showNewProtocol,
-						"btn-outline border-none": showNewProtocol,
-					})}
-					onClick={() => setShowNewProtocol(false)}
-				>
-					Follow
-				</div>
-				<div
-					className={cls("btn w-[150px] h-[26px] cursor-pointer", {
-						"btn-primary rounded-full": showNewProtocol,
-						"btn-outline border-none": !showNewProtocol,
-					})}
-					onClick={() => setShowNewProtocol(true)}
-				>
-					New
-				</div>
-			</div> */}
-
 			{isLoading ? (
 				<div className="flex items-center gap-2 justify-center h-[200px]">
 					<div>Protocol Feed is Coming</div>
 					<span className="loading loading-bars loading-md grid text-white"></span>
 				</div>
 			) : (
-				<div className="flex flex-col gap-3 my-4">
-					{protocoles}
+				<>
+					<div id="cards" className="grid grid-cols-3 gap-3 mt-6">
+						{protocoles}
+					</div>
 					<button
 						ref={ref}
-						className="btn  "
+						className="btn w-full mt-6"
 						onClick={() => fetchNextPage()}
 						disabled={!hasNextPage || isFetchingNextPage}
 					>
@@ -223,13 +119,10 @@ const ProtocolList = () => {
 								<span className="loading loading-dots loading-md grid text-white"></span>
 							</div>
 						) : (
-							//  hasNextPage ? (
-							//   <div className='bg-[black] flex items-center w-full'> Load Newer </div>
-							// ) :
-							<div className=" place-items-center">Nothing more to load </div>
+							<div>Nothing more to load </div>
 						)}
 					</button>
-				</div>
+				</>
 			)}
 		</div>
 	);

@@ -2,8 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	--bg-color: rgb(20, 20, 20);
+	--card-color: rgb(23, 23, 23, 0.4);
+}
+
 body {
-	background-color: black;
+	background-color: var(--bg-color);
 	height: 100vh;
 	position: relative;
 	/* overflow: hidden; */

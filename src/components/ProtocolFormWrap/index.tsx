@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import { useMutation, useQueryClient } from '@tanstack/react-query';
 // import { createProtocol } from '../api/protocol';
-import ProtocolForm, { AttachmentItem, ProtocolData } from "./ProtocolForm";
+import ProtocolForm, { AttachmentItem, ProtocolFormData } from "./ProtocolForm";
 // import { v4 as uuidv4 } from 'uuid';
 import { toast } from "react-toastify";
 import LoadingOverlay from "react-loading-overlay-ts";
@@ -17,6 +17,9 @@ import { CreateOptions } from "@metaid/metaid/dist/core/entity/btc";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { image2Attach } from "../../utils/file";
 import useImagesPreview from "../../hooks/useImagesPreview";
+import { ProtocolItem } from "../../types";
+import { createBrfcid } from "../../utils/crypto";
+import { temp_protocol } from "../../utils/mockData";
 const ProtocolFormWrap = () => {
 	const protocolEntity = useAtomValue(protocolEntityAtom);
 	const btcConnector = useAtomValue(btcConnectorAtom);
@@ -24,36 +27,55 @@ const ProtocolFormWrap = () => {
 	const [isAdding, setIsAdding] = useState(false);
 	const queryClient = useQueryClient();
 
-	const protocolFormHandle = useForm<ProtocolData>();
-	const files = protocolFormHandle.watch("images");
-	console.log(protocolFormHandle.getValues("images"));
+	const protocolFormHandle = useForm<ProtocolFormData>();
+	const files = protocolFormHandle.watch("protocolAttachments");
 	const [filesPreview, setFilesPreview] = useImagesPreview(files);
 	const onClearImageUploads = () => {
 		setFilesPreview([]);
-		protocolFormHandle.setValue("images", [] as any);
+		protocolFormHandle.setValue("protocolAttachments", [] as any);
 	};
 
-	const onCreateSubmit: SubmitHandler<ProtocolData> = async (data) => {
-		const images = data.images.length !== 0 ? await image2Attach(data.images) : [];
+	const onCreateSubmit: SubmitHandler<ProtocolFormData> = async (data) => {
+		const protocolAttachments =
+			data.protocolAttachments.length !== 0
+				? await image2Attach(data.protocolAttachments)
+				: [];
 
 		await handleAddProtocol({
-			content: data.content,
-			images,
+			...data,
+			protocolAttachments,
 		});
-		console.log("data images", data.images, filesPreview);
+		console.log("data protocolAttachments", data.protocolAttachments);
 	};
 
-	const handleAddProtocol = async (protocol: { content: string; images: AttachmentItem[] }) => {
+	const handleAddProtocol = async (
+		protocol: Omit<ProtocolFormData, "protocolAttachments"> & {
+			protocolAttachments: AttachmentItem[];
+		}
+	) => {
 		setIsAdding(true);
+
+		console.log("protocol data", temp_protocol);
+		const protocolHASHID = createBrfcid({
+			title: protocol.protocolTitle,
+			author: protocol.protocolAuthor,
+			version: protocol.protocolVersion,
+		});
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const finalBody: any = { content: protocol.content };
-			if (!isEmpty(protocol.images)) {
+			const finalBody: ProtocolItem = {
+				...temp_protocol,
+				protocolHASHID,
+				protocolAttachments: [],
+				tags: ["meta", "protocols"],
+				relatedProtocols: [],
+			};
+			if (!isEmpty(protocol.protocolAttachments)) {
 				const fileOptions: CreateOptions[] = [];
 
 				const fileEntity = await btcConnector!.use("file");
 
-				for (const image of protocol.images) {
+				for (const image of protocol.protocolAttachments) {
 					// console.log("image.data", Buffer.from(image.data, "hex").toString("base64"));
 					fileOptions.push({
 						body: Buffer.from(image.data, "hex").toString("base64"),
@@ -67,7 +89,7 @@ const ProtocolFormWrap = () => {
 				});
 
 				console.log("imageRes", imageRes);
-				finalBody.attachments = imageRes.revealTxIds.map(
+				finalBody.protocolAttachments = imageRes.revealTxIds.map(
 					(rid) => "metafile://" + rid + "i0"
 				);
 			}
@@ -82,7 +104,7 @@ const ProtocolFormWrap = () => {
 			console.log("create res for inscribe", createRes);
 			if (!isNil(createRes?.revealTxIds[0])) {
 				await sleep(5000);
-				queryClient.invalidateQueries({ queryKey: ["protocoles"] });
+				queryClient.invalidateQueries({ queryKey: ["metaprotocols"] });
 				toast.success("create protocol successfully");
 				protocolFormHandle.reset();
 				onClearImageUploads();
@@ -106,7 +128,7 @@ const ProtocolFormWrap = () => {
 	};
 
 	return (
-		<LoadingOverlay active={isAdding} spinner text="Creating Protocol...">
+		<LoadingOverlay active={isAdding} spinner text="Submiting New Protocol...">
 			<ProtocolForm
 				onCreateSubmit={onCreateSubmit}
 				protocolFormHandle={protocolFormHandle}
@@ -118,37 +140,3 @@ const ProtocolFormWrap = () => {
 };
 
 export default ProtocolFormWrap;
-
-// const AddProtocol = () => {
-// 	const queryClient = useQueryClient();
-
-// 	const createProtocolMutation = useMutation({
-// 		mutationFn: createProtocol,
-// 		onSuccess: async () => {
-// 			await queryClient.invalidateQueries({ queryKey: ["protocoles"] });
-// 			toast.success("create protocol success!");
-// 			const doc_modal = document.getElementById("new_protocol_modal") as HTMLDialogElement;
-// 			doc_modal.close();
-// 		},
-// 	});
-
-// 	const handleAddProtocol = (protocol: ProtocolNewForm) => {kl
-// 		const id = uuidv4();
-// 		createProtocolMutation.mutate({
-// 			...protocol,
-// 			id,
-// 			createTime: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-// 			user: "vae",
-// 			isFollowed: false,
-// 			txid: id,
-// 		});
-// 	};
-
-// 	return (
-// 		<LoadingOverlay active={createProtocolMutation.isPending} spinner text="Protocol is Creating...">
-// 			<ProtocolForm onSubmit={handleAddProtocol} initialValue={{ content: "", createTime: "" }} />{" "}
-// 		</LoadingOverlay>
-// 	);
-// };
-
-// export default AddProtocol;

@@ -31,7 +31,7 @@ export async function getPinDetailByPid({
 }: {
 	pid: string;
 	network?: "livenet" | "testnet";
-}): Promise<Pin[] | null> {
+}): Promise<Pin | null> {
 	const url = `${BASE_METAID_TEST_URL}/api/btc/pin/${pid}`;
 
 	try {

@@ -1,13 +1,13 @@
 export type ProtocolItem = {
 	protocolTitle: string;
-	protocolAuthors: string;
+	protocolAuthor: string;
 	protocolVersion: string;
 	protocolName: string;
 	protocolHASHID: string;
 	protocolType: string;
 	protocolEncoding: string;
-	protocolIntrodution: string;
-	protocolIntrodutionType: string;
+	protocolIntroduction: string;
+	protocolIntroductionType: string;
 	protocolContent: string;
 	protocolContentType: string;
 	protocolDescription: string;

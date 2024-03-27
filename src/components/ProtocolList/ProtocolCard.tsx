@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import FollowButton from "../Buttons/FollowButton";
-import { Heart, Link as LucideLink } from "lucide-react";
+import { Expand, Heart, Link as LucideLink } from "lucide-react";
 // import { MessageCircle, Send, } from "lucide-react";
 import { isEmpty, isNil } from "ramda";
 import cls from "classnames";
@@ -15,32 +15,25 @@ import CustomAvatar from "../CustomAvatar";
 import { toast } from "react-toastify";
 import { fetchCurrentProtocolLikes } from "../../api/protocol";
 import { checkMetaidInit } from "../../utils/wallet";
-
+import { temp_protocol } from "../../utils/mockData";
+import "./styles.css";
 type IProps = {
 	protocolItem: Pin | undefined;
-	onProtocolDetail?: (txid: string) => void;
-	innerRef?: React.Ref<HTMLDivElement>;
+	onProtocolDetail?: (pinId: string) => void;
 };
 
-const ProtocolCard = ({ protocolItem, onProtocolDetail, innerRef }: IProps) => {
+const ProtocolCard = ({ protocolItem, onProtocolDetail }: IProps) => {
 	const btcConnector = useAtomValue(btcConnectorAtom);
 	const userInfo = useAtomValue(userInfoAtom);
 	const queryClient = useQueryClient();
-	// console.log("protocolitem", protocolItem);
-	let summary = protocolItem!.contentSummary;
-	const isSummaryJson = summary.startsWith("{") && summary.endsWith("}");
-	// console.log("isjson", isSummaryJson);
-	// console.log("summary", summary);
-	const parseSummary = isSummaryJson ? JSON.parse(summary) : {};
 
-	summary = isSummaryJson ? parseSummary.content : summary;
+	const summary = protocolItem!.contentSummary;
+	const isSummaryJson = summary.startsWith("{") && summary.endsWith("}");
+	const parseSummary = isSummaryJson ? JSON.parse(summary) : {};
 
 	const attachPids = isSummaryJson
 		? (parseSummary?.attachments ?? []).map((d: string) => d.split("metafile://")[1])
 		: [];
-
-	// const attachPids = ["6950f69d7cb83a612fc773d95500a137888f157f1d377cc69c2dd703eebd84eei0"];
-	// console.log("current address", protocolItem!.address);
 
 	const { data: currentLikeData } = useQuery({
 		queryKey: ["payLike", protocolItem!.id],
@@ -54,10 +47,9 @@ const ProtocolCard = ({ protocolItem, onProtocolDetail, innerRef }: IProps) => {
 		queryKey: ["userInfo", protocolItem!.address],
 		queryFn: () => btcConnector?.getUser(protocolItem!.address),
 	});
-	// console.log("address", protocolItem!.address);
-	// console.log("currentUserInfoData", currentUserInfoData.data);
+
 	const attachData = useQueries({
-		queries: attachPids.map((id: string) => {
+		queries: (attachPids ?? []).map((id: string) => {
 			return {
 				queryKey: ["post", id],
 				queryFn: () => getPinDetailByPid({ pid: id }),
@@ -70,7 +62,6 @@ const ProtocolCard = ({ protocolItem, onProtocolDetail, innerRef }: IProps) => {
 			};
 		},
 	});
-	// console.log("attachData", attachData);
 
 	const handleLike = async (pinId: string) => {
 		await checkMetaidInit(userInfo!);
@@ -91,7 +82,7 @@ const ProtocolCard = ({ protocolItem, onProtocolDetail, innerRef }: IProps) => {
 			});
 			console.log("likeRes", likeRes);
 			if (!isNil(likeRes?.revealTxIds[0])) {
-				queryClient.invalidateQueries({ queryKey: ["protocoles"] });
+				queryClient.invalidateQueries({ queryKey: ["metaprotocols"] });
 				queryClient.invalidateQueries({ queryKey: ["payLike", protocolItem!.id] });
 				// await sleep(5000);
 				toast.success("like protocol successfully");
@@ -107,103 +98,69 @@ const ProtocolCard = ({ protocolItem, onProtocolDetail, innerRef }: IProps) => {
 		}
 	};
 
-	const renderImages = (pinIds: string[]) => {
-		return (
-			<div className="grid grid-cols-3 gap-2 place-items-center">
-				{pinIds.map((pinId) => {
-					return (
-						<img
-							className="image"
-							height={"48px"}
-							width={"auto"}
-							src={`https://man-test.metaid.io/content/${pinId}`}
-							alt=""
-							key={pinId}
-						/>
-					);
-				})}
-			</div>
-		);
-	};
 	if (isNil(protocolItem)) {
 		return <div>can't fetch this protocol</div>;
 	}
 
 	return (
-		<div className="w-full border border-white rounded-xl flex flex-col gap-4" ref={innerRef}>
-			<div className="flex items-center justify-between pt-4 px-4">
-				<div className="flex gap-2 items-center">
-					{/* <img
-						src={`https://picsum.photos/seed/${imgSeed}/200`}
-						alt="user avatar"
-						className="rounded-full"
-						width={40}
-						height={40}
-					/> */}
-					{isNil(currentUserInfoData.data) ? (
-						<div className="avatar placeholder">
-							<div className="bg-[#2B3440] text-[#D7DDE4] rounded-full w-12">
-								<span>{protocolItem!.address.slice(-4, -2)}</span>
-							</div>
-						</div>
-					) : (
-						<CustomAvatar userInfo={currentUserInfoData.data} />
-					)}
-
-					<div className="text-gray">
-						{isNil(currentUserInfoData?.data?.name) ||
-						isEmpty(currentUserInfoData?.data?.name)
-							? "metaid-user-" + protocolItem.address.slice(-4)
-							: currentUserInfoData?.data?.name}
-					</div>
-				</div>
-				{/* <FollowButton isFollowed={true} /> */}
-			</div>
-			<div
-				className={cls("border-y border-white p-4", {
-					"cursor-pointer": !isNil(onProtocolDetail),
-				})}
-				// onClick={() => onProtocolDetail && onProtocolDetail(protocolItem.id)}
-			>
-				<div className="flex flex-col gap-2">
-					<div>{summary} </div>
-					{!attachData.pending &&
-						!isEmpty((attachData?.data ?? []).filter((d: any) => !isNil(d))) &&
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						renderImages(attachPids)}
-				</div>
-				<div className="flex justify-between text-gray mt-2">
-					<div
-						className="flex gap-2 items-center"
-						onClick={() => {
-							window.open(
-								`https://mempool.space/zh/testnet/tx/${protocolItem.genesisTransaction}`,
-								"_blank"
-							);
-						}}
-					>
-						<LucideLink size={12} />
-						<div>{protocolItem.genesisTransaction.slice(0, 8) + "..."}</div>
-					</div>
-					<div>{dayjs.unix(protocolItem.timestamp).format("YYYY-MM-DD HH:mm:ss")}</div>
-				</div>
-			</div>
-
-			<div className="flex items-center justify-between pb-4 px-4">
-				<div className="flex gap-2">
-					<Heart
-						className={cls({ "text-[red]": isLikeByCurrentUser }, "cursor-pointer")}
-						fill={isLikeByCurrentUser && "red"}
-						onClick={() => handleLike(protocolItem!.id)}
+		<>
+			<div className="card">
+				<div className="card-content gap-4 justify-between">
+					<Expand
+						onClick={() => onProtocolDetail && onProtocolDetail(protocolItem.id)}
+						color="#929090"
+						className=" absolute right-5 top-5 hover:scale-[1.30] duration-1000"
 					/>
 
-					{!isNil(currentLikeData) ? currentLikeData.length : null}
-					{/* <MessageCircle />
-					<Send /> */}
+					<div className="flex flex-col gap-1">
+						<div className="font-mono">{parseSummary.protocolTitle}</div>
+						<div className="flex gap-2 items-center">
+							{parseSummary.tags.map((d: string) => {
+								return (
+									<div className="hover:bg-slate-600	 text-xs font-thin text-slate-50/30 border border-slate-50/10 rounded-full px-2 pt-0.5 pb-1  text-center">
+										{d}
+									</div>
+								);
+							})}
+						</div>
+					</div>
+					<div className="text-sm">
+						{parseSummary.protocolIntroduction.split(".")[0] + "..."}
+					</div>
+
+					<div className="flex justify-between items-center">
+						<div className="flex gap-2 items-center">
+							{isNil(currentUserInfoData.data) ? (
+								<div className="avatar placeholder">
+									<div className="bg-[#2B3440] text-[#D7DDE4] rounded-full w-10">
+										<span>{protocolItem!.address.slice(-4, -2)}</span>
+									</div>
+								</div>
+							) : (
+								<CustomAvatar size={10} userInfo={currentUserInfoData.data} />
+							)}
+							<div className="text-gray">
+								{isNil(currentUserInfoData?.data?.name) ||
+								isEmpty(currentUserInfoData?.data?.name)
+									? "metaid-user-" + protocolItem.address.slice(-4)
+									: currentUserInfoData?.data?.name}
+							</div>
+						</div>
+						<div className="flex gap-2">
+							<Heart
+								className={cls(
+									{ "text-[red]": isLikeByCurrentUser },
+									"text-slate-50/50 hover:scale-[1.3] duration-1000"
+								)}
+								fill={isLikeByCurrentUser && "red"}
+								onClick={() => handleLike(protocolItem!.id)}
+							/>
+							{!isNil(currentLikeData) ? currentLikeData.length : null}
+						</div>
+					</div>
 				</div>
-				{/* <div className="btn btn-sm rounded-full">Want To Buy</div> */}
 			</div>
-		</div>
+		</>
 	);
 };
 

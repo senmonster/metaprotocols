@@ -18,7 +18,7 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 	const onProtocolStart = async () => {
 		await checkMetaletInstalled();
 		await checkMetaletConnected(connected);
-		console.log("userinfo on protocol start", userInfo);
+		// console.log("userinfo on protocol start", userInfo);
 		await checkMetaidInit(userInfo!);
 		const doc_modal = document.getElementById("new_protocol_modal") as HTMLDialogElement;
 		doc_modal.showModal();
@@ -28,7 +28,7 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 		const doc_modal = document.getElementById("edit_metaid_modal") as HTMLDialogElement;
 		doc_modal.showModal();
 	};
-	console.log("userInfo", userInfo);
+	// console.log("userInfo", userInfo);
 	return (
 		<>
 			<div className="z-10 navbar p-3 bg-main absolute top-0">
@@ -81,14 +81,14 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 				</div>
 			</div>
 			<dialog id="new_protocol_modal" className="modal">
-				<div className="modal-box bg-[#191C20] py-5 w-[50%]">
+				<div className="modal-box bg-[#191C20] py-5 w-[60%]">
 					<form method="dialog">
 						{/* if there is a button in form, it will close the modal */}
 						<button className="border border-white text-white btn btn-xs btn-circle absolute right-5 top-5.5">
 							✕
 						</button>
 					</form>
-					<h3 className="font-medium text-white text-[16px] text-center">New Releases</h3>
+					<h3 className="font-medium text-white text-[16px] text-center">New Protocol</h3>
 					<ProtocolFormWrap />
 				</div>
 				<form method="dialog" className="modal-backdrop">

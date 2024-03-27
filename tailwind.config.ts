@@ -16,14 +16,14 @@ const config: Config = {
 		],
 	},
 	theme: {
-		colors: {
-			main: "#E0E8F8",
-			secondary: "#daf77380",
-			white: "#fff",
-			black: "#fafafa",
-			gray: "#898A8C",
-		},
 		extend: {
+			colors: {
+				main: "#E0E8F8",
+				secondary: "#daf77380",
+				white: "#fff",
+				black: "#fafafa",
+				card: "#272727",
+			},
 			backgroundImage: {
 				"gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
 				"gradient-conic":
@@ -32,7 +32,6 @@ const config: Config = {
 		},
 		container: {
 			center: true,
-			padding: "8rem",
 			screens: {
 				"2xl": "1000px",
 			},
