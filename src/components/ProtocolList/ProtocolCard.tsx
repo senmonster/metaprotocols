@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import FollowButton from "../Buttons/FollowButton";
-import { Expand, Heart, Link as LucideLink } from 'lucide-react';
+import { Expand, Heart } from 'lucide-react';
 // import { MessageCircle, Send, } from "lucide-react";
 import { isEmpty, isNil } from 'ramda';
 import cls from 'classnames';
-import dayjs from 'dayjs';
 import { Pin } from '.';
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getPinDetailByPid } from '../../api/pin';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+// import { getPinDetailByPid } from '../../api/pin';
 import { btcConnectorAtom, userInfoAtom } from '../../store/user';
 import { useAtomValue } from 'jotai';
 import CustomAvatar from '../CustomAvatar';
@@ -15,7 +14,7 @@ import CustomAvatar from '../CustomAvatar';
 import { toast } from 'react-toastify';
 import { fetchCurrentProtocolLikes } from '../../api/protocol';
 import { checkMetaidInit } from '../../utils/wallet';
-import { temp_protocol } from '../../utils/mockData';
+// import { temp_protocol } from '../../utils/mockData';
 import './styles.css';
 type IProps = {
   protocolItem: Pin | undefined;
@@ -31,11 +30,11 @@ const ProtocolCard = ({ protocolItem, onProtocolDetail }: IProps) => {
   const isSummaryJson = summary.startsWith('{') && summary.endsWith('}');
   const parseSummary = isSummaryJson ? JSON.parse(summary) : {};
 
-  const attachPids = isSummaryJson
-    ? (parseSummary?.attachments ?? []).map(
-        (d: string) => d.split('metafile://')[1]
-      )
-    : [];
+  // const attachPids = isSummaryJson
+  //   ? (parseSummary?.attachments ?? []).map(
+  //       (d: string) => d.split('metafile://')[1]
+  //     )
+  //   : [];
 
   const { data: currentLikeData } = useQuery({
     queryKey: ['payLike', protocolItem!.id],
@@ -51,20 +50,20 @@ const ProtocolCard = ({ protocolItem, onProtocolDetail }: IProps) => {
   });
   console.log('current user data', currentUserInfoData.data);
 
-  const attachData = useQueries({
-    queries: (attachPids ?? []).map((id: string) => {
-      return {
-        queryKey: ['post', id],
-        queryFn: () => getPinDetailByPid({ pid: id }),
-      };
-    }),
-    combine: (results: any) => {
-      return {
-        data: results.map((result: any) => result.data),
-        pending: results.some((result: any) => result.isPending),
-      };
-    },
-  });
+  // const attachData = useQueries({
+  //   queries: (attachPids ?? []).map((id: string) => {
+  //     return {
+  //       queryKey: ['post', id],
+  //       queryFn: () => getPinDetailByPid({ pid: id }),
+  //     };
+  //   }),
+  //   combine: (results: any) => {
+  //     return {
+  //       data: results.map((result: any) => result.data),
+  //       pending: results.some((result: any) => result.isPending),
+  //     };
+  //   },
+  // });
 
   const handleLike = async (pinId: string) => {
     await checkMetaidInit(userInfo!);
