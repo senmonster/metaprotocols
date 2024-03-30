@@ -16,7 +16,6 @@ import { sleep } from "../../utils/time";
 import { CreateOptions } from "@metaid/metaid/dist/core/entity/btc";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { image2Attach } from "../../utils/file";
-import useImagesPreview from "../../hooks/useImagesPreview";
 import { ProtocolItem } from "../../types";
 import { createBrfcid } from "../../utils/crypto";
 import { temp_protocol } from "../../utils/mockData";
@@ -28,16 +27,14 @@ const ProtocolFormWrap = () => {
 	const queryClient = useQueryClient();
 
 	const protocolFormHandle = useForm<ProtocolFormData>();
-	const files = protocolFormHandle.watch("protocolAttachments");
-	const [filesPreview, setFilesPreview] = useImagesPreview(files);
-	const onClearImageUploads = () => {
-		setFilesPreview([]);
-		protocolFormHandle.setValue("protocolAttachments", [] as any);
-	};
 
 	const onCreateSubmit: SubmitHandler<ProtocolFormData> = async (data) => {
+		console.log("submit form protocol data", data);
+		if (isEmpty(data.tags)) {
+			protocolFormHandle.setError("tags", { type: "Required" });
+		}
 		const protocolAttachments =
-			data.protocolAttachments.length !== 0
+			data?.protocolAttachments?.length !== 0 && !isNil(data?.protocolAttachments)
 				? await image2Attach(data.protocolAttachments)
 				: [];
 
@@ -45,7 +42,6 @@ const ProtocolFormWrap = () => {
 			...data,
 			protocolAttachments,
 		});
-		console.log("data protocolAttachments", data.protocolAttachments);
 	};
 
 	const handleAddProtocol = async (
@@ -107,7 +103,6 @@ const ProtocolFormWrap = () => {
 				queryClient.invalidateQueries({ queryKey: ["metaprotocols"] });
 				toast.success("create protocol successfully");
 				protocolFormHandle.reset();
-				onClearImageUploads();
 
 				const doc_modal = document.getElementById(
 					"new_protocol_modal"
@@ -129,12 +124,7 @@ const ProtocolFormWrap = () => {
 
 	return (
 		<LoadingOverlay active={isAdding} spinner text="Submiting New Protocol...">
-			<ProtocolForm
-				onCreateSubmit={onCreateSubmit}
-				protocolFormHandle={protocolFormHandle}
-				onClearImageUploads={onClearImageUploads}
-				filesPreview={filesPreview}
-			/>
+			<ProtocolForm onCreateSubmit={onCreateSubmit} protocolFormHandle={protocolFormHandle} />
 		</LoadingOverlay>
 	);
 };
