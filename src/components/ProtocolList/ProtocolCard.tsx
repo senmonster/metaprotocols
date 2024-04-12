@@ -7,13 +7,13 @@ import cls from "classnames";
 import { Pin } from ".";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // import { getPinDetailByPid } from '../../api/pin';
-import { btcConnectorAtom, userInfoAtom } from "../../store/user";
+import { btcConnectorAtom, connectedAtom, initStillPoolAtom } from "../../store/user";
 import { useAtomValue } from "jotai";
 import CustomAvatar from "../CustomAvatar";
 // import { sleep } from '../../utils/time';
 import { toast } from "react-toastify";
 import { fetchCurrentProtocolLikes } from "../../api/protocol";
-import { checkMetaidInit } from "../../utils/wallet";
+import { checkMetaletConnected, checkMetaletInstalled } from "../../utils/wallet";
 // import { temp_protocol } from '../../utils/mockData';
 import "./styles.css";
 import { useNavigate } from "react-router-dom";
@@ -22,8 +22,11 @@ type IProps = {
 };
 
 const ProtocolCard = ({ protocolItem }: IProps) => {
+	const connected = useAtomValue(connectedAtom);
+
 	const btcConnector = useAtomValue(btcConnectorAtom);
-	const userInfo = useAtomValue(userInfoAtom);
+	const stillPool = useAtomValue(initStillPoolAtom);
+
 	const queryClient = useQueryClient();
 
 	const summary = protocolItem!.contentSummary;
@@ -66,9 +69,15 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 	// });
 
 	const handleLike = async (pinId: string) => {
-		await checkMetaidInit(userInfo!);
+		await checkMetaletInstalled();
+		await checkMetaletConnected(connected);
+		if (stillPool) {
+			return;
+		}
 		if (isLikeByCurrentUser) {
-			toast.warn("You have already liked that protocol...");
+			toast.error("You have already liked that protocol...", {
+				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+			});
 			return;
 		}
 
@@ -98,7 +107,9 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 				? "User Canceled"
 				: errorMessage;
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			toast.warn(toastMessage);
+			toast.error(toastMessage, {
+				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+			});
 		}
 	};
 	const navigate = useNavigate();
@@ -111,13 +122,15 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 			<div className="card" onClick={() => navigate(`/protocol/${protocolItem.id}`)}>
 				<div className="card-content gap-4 justify-between">
 					<div className="flex flex-col gap-1">
-						<div className="font-mono">{parseSummary.protocolTitle}</div>
+						<div className="font-mono text-xl font-bold">
+							{parseSummary.protocolTitle}
+						</div>
 						<div className="flex gap-2 items-center">
 							{parseSummary.tags.map((d: string) => {
 								return (
 									<div
 										key={d}
-										className="hover:bg-slate-600 	 text-xs font-thin text-slate-50/30 border border-slate-50/10 rounded-full px-2 pt-0.5 pb-1  text-center"
+										className="hover:bg-slate-600 text-xs font-thin text-slate-50/30 border border-slate-50/10 rounded-full px-2 pt-0.5 pb-1  text-center"
 									>
 										{d}
 									</div>
@@ -125,8 +138,8 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 							})}
 						</div>
 					</div>
-					<div className="text-sm">
-						{parseSummary.protocolIntroduction.split(".")[0] + "..."}
+					<div className="text-xs text-wrap break-all truncate">
+						{parseSummary.protocolIntroduction.split(".")[0]}
 					</div>
 
 					<div className="flex justify-between items-center">
@@ -138,9 +151,9 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 									</div>
 								</div>
 							) : (
-								<CustomAvatar size={10} userInfo={currentUserInfoData.data} />
+								<CustomAvatar size={8} userInfo={currentUserInfoData.data} />
 							)}
-							<div className="text-gray">
+							<div className="text-gray text-xs">
 								{isNil(currentUserInfoData?.data?.name) ||
 								isEmpty(currentUserInfoData?.data?.name)
 									? "metaid-user-" + protocolItem.address.slice(-4)
@@ -149,6 +162,7 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 						</div>
 						<div className="flex gap-2">
 							<Heart
+								size={18}
 								className={cls(
 									{ "text-[red]": isLikeByCurrentUser },
 									"text-slate-50/50 hover:scale-[1.3] duration-1000"

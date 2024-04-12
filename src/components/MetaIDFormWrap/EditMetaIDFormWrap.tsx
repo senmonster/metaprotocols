@@ -14,6 +14,7 @@ export type MetaidUserInfo = {
 	name: string;
 	bio?: string;
 	avatar?: string;
+	feeRate?: number;
 };
 
 type Iprops = {
@@ -49,7 +50,9 @@ const EditMetaIDFormWrap = ({ btcConnector }: Iprops) => {
 			const toastMessage = errorMessage.includes("Cannot read properties of undefined")
 				? "User Canceled"
 				: errorMessage;
-			toast.warn(toastMessage);
+			toast.error(toastMessage, {
+				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+			});
 			setIsEditing(false);
 			setUserInfoStartValues(userInfoStartValues);
 			//   console.log('error get user', await btcConnector.getUser());

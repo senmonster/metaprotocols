@@ -25,7 +25,7 @@ function TagInput({ tags, onAddTag, onDeleteTag, placeHolder }: IProps) {
 			<TagList tags={tags} onDeleteTag={_onDeleteTag} />
 			<div className="flex gap-2 mt-2">
 				<input
-					className="input input-bordered input-sm"
+					className="input input-bordered input-sm text-white bg-[black] !outline-none"
 					onChange={(e) => setTempV(e.currentTarget.value)}
 					type="text"
 					value={tempV}

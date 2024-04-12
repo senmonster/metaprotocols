@@ -9,8 +9,8 @@ import LoadingOverlay from "react-loading-overlay-ts";
 import { protocolEntityAtom } from "../../store/protocol";
 import { useAtomValue } from "jotai";
 import { isEmpty, isNil } from "ramda";
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { btcConnectorAtom } from "../../store/user";
 import { sleep } from "../../utils/time";
 import { CreateOptions } from "@metaid/metaid/dist/core/entity/btc";
@@ -19,6 +19,7 @@ import { image2Attach } from "../../utils/file";
 import { ProtocolItem } from "../../types";
 import { createBrfcid } from "../../utils/crypto";
 import { temp_protocol } from "../../utils/mockData";
+import { fetchFeeRate } from "../../api/fee";
 const ProtocolFormWrap = () => {
 	const protocolEntity = useAtomValue(protocolEntityAtom);
 	const btcConnector = useAtomValue(btcConnectorAtom);
@@ -82,6 +83,7 @@ const ProtocolFormWrap = () => {
 				const imageRes = await fileEntity.create({
 					options: fileOptions,
 					noBroadcast: "no",
+					feeRate: selectFeeRate?.number,
 				});
 
 				console.log("imageRes", imageRes);
@@ -96,6 +98,7 @@ const ProtocolFormWrap = () => {
 			const createRes = await protocolEntity!.create({
 				options: [{ body: JSON.stringify(finalBody) }],
 				noBroadcast: "no",
+				feeRate: selectFeeRate?.number,
 			});
 			console.log("create res for inscribe", createRes);
 			if (!isNil(createRes?.revealTxIds[0])) {
@@ -116,15 +119,45 @@ const ProtocolFormWrap = () => {
 				? "User Canceled"
 				: errorMessage;
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			toast.warn(toastMessage);
+			toast.error(toastMessage, {
+				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+			});
 			setIsAdding(false);
 		}
 		setIsAdding(false);
 	};
 
+	const { data: feeRateData } = useQuery({
+		queryKey: ["feeRate"],
+		queryFn: () => fetchFeeRate({ netWork: "testnet" }),
+	});
+
+	const [customFee, setCustomFee] = useState<string>("1");
+
+	const feeRateOptions = useMemo(() => {
+		return [
+			{ name: "Slow", number: feeRateData?.hourFee ?? 1 },
+			{ name: "Avg", number: feeRateData?.halfHourFee ?? 1 },
+			{ name: "Fast", number: feeRateData?.fastestFee ?? 1 },
+			{ name: "Custom", number: Number(customFee) },
+		];
+	}, [feeRateData, customFee]);
+	const [selectFeeRate, setSelectFeeRate] = useState<{ name: string; number: number }>({
+		name: "Slow",
+		number: feeRateData?.hourFee ?? 1,
+	});
+
 	return (
 		<LoadingOverlay active={isAdding} spinner text="Submiting New Protocol...">
-			<ProtocolForm onCreateSubmit={onCreateSubmit} protocolFormHandle={protocolFormHandle} />
+			<ProtocolForm
+				onCreateSubmit={onCreateSubmit}
+				protocolFormHandle={protocolFormHandle}
+				customFee={customFee}
+				setSelectFeeRate={setSelectFeeRate}
+				selectFeeRate={selectFeeRate}
+				handleCustomFeeChange={setCustomFee}
+				feeRateOptions={feeRateOptions}
+			/>
 		</LoadingOverlay>
 	);
 };

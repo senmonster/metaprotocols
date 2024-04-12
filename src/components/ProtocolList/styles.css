@@ -15,7 +15,6 @@
 	height: 260px;
 	flex-direction: column;
 	position: relative;
-	width: 300px;
 }
 
 .card:hover::before {
@@ -69,7 +68,7 @@
 /* -- ↓ ↓ ↓ extra card content styles ↓ ↓ ↓ -- */
 
 /* -- ↓ ↓ ↓ some responsiveness ↓ ↓ ↓ -- */
-
+/* 
 @media (max-width: 1000px) {
 	body {
 		align-items: flex-start;
@@ -122,4 +121,4 @@
 	.card {
 		width: 100%;
 	}
-}
+} */

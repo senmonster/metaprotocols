@@ -13,6 +13,7 @@ export type MetaidUserInfo = {
 	name: string;
 	bio?: string;
 	avatar?: string;
+	feeRate?: number;
 };
 
 const CreateMetaIDFormWrap = ({
@@ -41,12 +42,16 @@ const CreateMetaIDFormWrap = ({
 			const toastMessage = errorMessage.includes("Cannot read properties of undefined")
 				? "User Canceled"
 				: errorMessage;
-			toast.error(toastMessage);
+			toast.error(toastMessage, {
+				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+			});
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		});
 
 		if (isNil(res?.metaid)) {
-			toast.error("Create Failed");
+			toast.error("Create Failed", {
+				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+			});
 		} else {
 			toast.success("Successfully created!Now you can connect your wallet again!");
 		}

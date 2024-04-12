@@ -7,6 +7,7 @@ import { IsEncrypt } from "../../utils/file";
 import { isEmpty, isNil } from "ramda";
 import TagInput from "./TagInput";
 import { useState } from "react";
+import CustomFeerate from "../CustomFeerate";
 
 export interface AttachmentItem {
 	fileName: string;
@@ -21,6 +22,23 @@ export interface AttachmentItem {
 type IProps = {
 	onCreateSubmit: SubmitHandler<ProtocolFormData>;
 	protocolFormHandle: UseFormReturn<ProtocolFormData, any, undefined>;
+
+	feeRateOptions: {
+		name: string;
+		number: number;
+	}[];
+	selectFeeRate: {
+		name: string;
+		number: number;
+	};
+	setSelectFeeRate: React.Dispatch<
+		React.SetStateAction<{
+			name: string;
+			number: number;
+		}>
+	>;
+	handleCustomFeeChange: (v: string) => void;
+	customFee: string;
 };
 
 export type ProtocolFormData = {
@@ -41,7 +59,15 @@ export type ProtocolFormData = {
 	relatedProtocols: string[];
 };
 
-const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
+const ProtocolForm = ({
+	onCreateSubmit,
+	protocolFormHandle,
+	feeRateOptions,
+	handleCustomFeeChange,
+	customFee,
+	selectFeeRate,
+	setSelectFeeRate,
+}: IProps) => {
 	const {
 		register,
 		handleSubmit,
@@ -102,7 +128,7 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 			<div className="flex flex-col gap-[24px] ">
 				<label
 					className={cls(
-						"input input-bordered input-sm flex items-center gap-2 relative ",
+						"input input-bordered input-sm text-white bg-[black] !outline-none flex items-center gap-2 relative ",
 						{
 							"input-error": errors.protocolTitle,
 						}
@@ -124,7 +150,7 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 
 				<label
 					className={cls(
-						"input input-bordered input-sm flex items-center gap-2 relative",
+						"input input-bordered input-sm text-white bg-[black] !outline-none flex items-center gap-2 relative",
 						{
 							"input-error": errors.protocolAuthor,
 						}
@@ -146,7 +172,7 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 
 				<label
 					className={cls(
-						"input input-bordered input-sm flex items-center gap-2 relative ",
+						"input input-bordered input-sm text-white bg-[black] !outline-none flex items-center gap-2 relative ",
 						{
 							"input-error": errors.protocolName,
 						}
@@ -156,7 +182,7 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 					<input
 						type="text"
 						className="grow"
-						placeholder="Enter here"
+						placeholder="Enter here."
 						{...register("protocolName", { required: true })}
 					/>
 					{errors.protocolName && (
@@ -168,7 +194,7 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 
 				<label
 					className={cls(
-						"input input-bordered input-sm flex items-center gap-2 relative ",
+						"input input-bordered input-sm text-white bg-[black] !outline-none flex items-center gap-2 relative ",
 						{
 							"input-error": errors.protocolVersion,
 						}
@@ -187,24 +213,32 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 						</span>
 					)}
 				</label>
+
 				<div className="flex items-center justify-between">
 					<div className="text-white text-sm">* Type</div>
 					<select
-						className={cls("select select-bordered select-sm w-[55%] max-w-xs", {
-							"select-error": errors.protocolType,
-						})}
+						className={cls(
+							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
+							{
+								"select-error": errors.protocolType,
+							}
+						)}
 						{...register("protocolType", { required: true })}
 					>
 						<option>application/json</option>
 						<option>image/apng</option>
 					</select>
 				</div>
+
 				<div className="flex items-center justify-between ">
 					<div className="text-white text-sm">* Encoding</div>
 					<select
-						className={cls("select select-bordered select-sm w-[55%] max-w-xs", {
-							"select-error": errors.protocolEncoding,
-						})}
+						className={cls(
+							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
+							{
+								"select-error": errors.protocolEncoding,
+							}
+						)}
 						{...register("protocolEncoding", { required: true })}
 					>
 						<option>text/plain</option>
@@ -218,9 +252,12 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 						<span className="label-text text-white">* Introduction</span>
 					</div>
 					<textarea
-						className={cls("textarea textarea-bordered h-24", {
-							"textarea-error": errors.protocolIntroduction,
-						})}
+						className={cls(
+							"textarea textarea-bordered text-white bg-[black] !outline-none h-24",
+							{
+								"textarea-error": errors.protocolIntroduction,
+							}
+						)}
 						placeholder="Enter here"
 						{...register("protocolIntroduction", { required: true })}
 					></textarea>
@@ -235,9 +272,12 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 				<div className="flex items-center justify-between ">
 					<div className="text-white text-sm">* IntroductionType</div>
 					<select
-						className={cls("select select-bordered select-sm w-[55%] max-w-xs", {
-							"textarea-error": errors.protocolIntroductionType,
-						})}
+						className={cls(
+							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
+							{
+								"textarea-error": errors.protocolIntroductionType,
+							}
+						)}
 						{...register("protocolIntroductionType", { required: true })}
 					>
 						<option>text/plain</option>
@@ -251,9 +291,12 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 						<span className="label-text text-white">* Content</span>
 					</div>
 					<textarea
-						className={cls("textarea textarea-bordered h-24", {
-							"textarea-error": errors.protocolContent,
-						})}
+						className={cls(
+							"textarea textarea-bordered text-white bg-[black] !outline-none h-24",
+							{
+								"textarea-error": errors.protocolContent,
+							}
+						)}
 						placeholder="Enter here"
 						{...register("protocolContent", { required: true })}
 					></textarea>
@@ -267,9 +310,12 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 				<div className="flex items-center justify-between">
 					<div className="text-white text-sm">* ContentType</div>
 					<select
-						className={cls("select select-bordered select-sm w-[55%] max-w-xs", {
-							"select-error": errors.protocolContentType,
-						})}
+						className={cls(
+							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
+							{
+								"select-error": errors.protocolContentType,
+							}
+						)}
 						{...register("protocolContentType", { required: true })}
 					>
 						<option>text/plain</option>
@@ -283,9 +329,12 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 						<span className="label-text text-white">* Description</span>
 					</div>
 					<textarea
-						className={cls("textarea textarea-bordered h-24", {
-							"textarea-error": errors.protocolDescription,
-						})}
+						className={cls(
+							"textarea textarea-bordered text-white bg-[black] !outline-none h-24",
+							{
+								"textarea-error": errors.protocolDescription,
+							}
+						)}
 						placeholder="Enter here"
 						{...register("protocolDescription", { required: true })}
 					></textarea>
@@ -299,9 +348,12 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 				<div className="flex items-center justify-between ">
 					<div className="text-white text-sm">* DescriptionType</div>
 					<select
-						className={cls("select select-bordered select-sm w-[55%] max-w-xs", {
-							"select-error": errors.protocolDescriptionType,
-						})}
+						className={cls(
+							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
+							{
+								"select-error": errors.protocolDescriptionType,
+							}
+						)}
 						{...register("protocolDescriptionType", { required: true })}
 					>
 						<option>text/plain</option>
@@ -309,6 +361,7 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 						<option>text/xml</option>
 					</select>
 				</div>
+
 				<div className="flex gap-2 items-center">
 					<div className="text-white text-sm">* Tags </div>
 					{errors.tags && (
@@ -383,6 +436,14 @@ const ProtocolForm = ({ onCreateSubmit, protocolFormHandle }: IProps) => {
 						</div>
 					</div>
 				</div>
+
+				<CustomFeerate
+					customFee={customFee}
+					setSelectFeeRate={setSelectFeeRate}
+					selectFeeRate={selectFeeRate}
+					handleCustomFeeChange={handleCustomFeeChange}
+					feeRateOptions={feeRateOptions}
+				/>
 			</div>
 
 			<button

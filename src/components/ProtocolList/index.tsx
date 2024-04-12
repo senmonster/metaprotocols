@@ -1,14 +1,16 @@
-import { Sparkle } from "lucide-react";
+import { RotateCw, Sparkle } from "lucide-react";
 import { useEffect, useState } from "react";
 import ProtocolCard from "./ProtocolCard";
 import { fetchProtocols } from "../../api/protocol";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { protocolEntityAtom } from "../../store/protocol";
 import { isNil } from "ramda";
 import { BtcEntity } from "@metaid/metaid/dist/core/entity/btc";
-// import { temp_pins } from "../../utils/mockData";
+import { btcConnect } from "@metaid/metaid";
+import { BtcConnector } from "@metaid/metaid/dist/core/connector/btc";
+import { userInfoAtom, walletAtom } from "../../store/user";
 // import './styles.css';
 export type Pin = {
 	id: string;
@@ -37,16 +39,23 @@ export type Pin = {
 const ProtocolList = () => {
 	const { ref, inView } = useInView();
 	const [total, setTotal] = useState<null | number>(null);
+	const setUserInfo = useSetAtom(userInfoAtom);
+	const _wallet = useAtomValue(walletAtom);
 
 	const protocolEntity = useAtomValue(protocolEntityAtom);
 	const getTotal = async (buzzEntity: BtcEntity) => {
-		setTotal(await buzzEntity.calcPins());
+		setTotal(await buzzEntity?.calcPins());
 	};
 
-	useEffect(() => {
-		getTotal(protocolEntity!);
-	}, [protocolEntity]);
-	const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } = useInfiniteQuery({
+	const {
+		data,
+		isLoading,
+		isRefetching,
+		refetch,
+		fetchNextPage,
+		isFetchingNextPage,
+		hasNextPage,
+	} = useInfiniteQuery({
 		queryKey: ["metaprotocols"],
 		enabled: !isNil(protocolEntity),
 
@@ -65,6 +74,12 @@ const ProtocolList = () => {
 			return nextPage;
 		},
 	});
+
+	useEffect(() => {
+		if (!isNil(protocolEntity)) {
+			getTotal(protocolEntity!);
+		}
+	}, [protocolEntity]);
 
 	useEffect(() => {
 		if (inView && hasNextPage) {
@@ -94,6 +109,15 @@ const ProtocolList = () => {
 		}
 	});
 
+	const handleRefresh = async () => {
+		refetch();
+		// const _wallet = await MetaletWalletForBtc.create();
+		const _btcConnector: BtcConnector = await btcConnect(_wallet ?? undefined);
+		const _user = await _btcConnector.getUser();
+
+		setUserInfo(_user);
+	};
+
 	return (
 		<div>
 			<div className="flex gap-2 items-center place-content-center mt-0">
@@ -101,6 +125,14 @@ const ProtocolList = () => {
 				<div className="text-white text-[36px] font-['Impact']">
 					{"Build Dapp With MetaProtocols"}
 				</div>
+				{!isRefetching ? (
+					<RotateCw
+						className="text-gray-500 absolute right-0 cursor-pointer"
+						onClick={handleRefresh}
+					/>
+				) : (
+					<div className="loading loading-dots absolute right-0 text-gray text-sm "></div>
+				)}
 				<Sparkle className="text-main" />
 			</div>
 
@@ -111,7 +143,10 @@ const ProtocolList = () => {
 				</div>
 			) : (
 				<>
-					<div id="cards" className="grid grid-cols-3 gap-3 mt-6">
+					<div
+						id="cards"
+						className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-5 gap-3 mt-6"
+					>
 						{protocoles}
 					</div>
 					<button

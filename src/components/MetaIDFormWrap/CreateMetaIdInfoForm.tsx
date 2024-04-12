@@ -6,6 +6,10 @@ import useImagesPreview from "../../hooks/useImagesPreview";
 import { isEmpty, isNil } from "ramda";
 import { image2Attach } from "../../utils/file";
 import { MetaidUserInfo } from "./CreateMetaIDFormWrap";
+import CustomFeerate from "../CustomFeerate";
+import { useQuery } from "@tanstack/react-query";
+import { fetchFeeRate } from "../../api/fee";
+import { useMemo, useState } from "react";
 
 export type UserInfo = {
 	name: string;
@@ -15,10 +19,7 @@ export type UserInfo = {
 
 type IProps = {
 	onSubmit: (userInfo: MetaidUserInfo) => void;
-	initialValues?: {
-		name?: string;
-		bio?: string | undefined;
-	};
+	initialValues?: MetaidUserInfo;
 };
 
 const CreateMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
@@ -45,11 +46,32 @@ const CreateMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
 				? Buffer.from(submitAvatar[0].data, "hex").toString("base64")
 				: undefined,
 			bio: isEmpty(data?.bio ?? "") ? undefined : data?.bio,
+			feeRate: selectFeeRate?.number ?? 1,
 		};
 		console.log("submit profile data", submitData);
 		onSubmit(submitData);
 	};
 	// console.log("avatar", avatar, !isEmpty(avatar));
+
+	const { data: feeRateData } = useQuery({
+		queryKey: ["feeRate"],
+		queryFn: () => fetchFeeRate({ netWork: "testnet" }),
+	});
+
+	const [customFee, setCustomFee] = useState<string>("1");
+
+	const feeRateOptions = useMemo(() => {
+		return [
+			{ name: "Slow", number: feeRateData?.hourFee ?? 1 },
+			{ name: "Avg", number: feeRateData?.halfHourFee ?? 1 },
+			{ name: "Fast", number: feeRateData?.fastestFee ?? 1 },
+			{ name: "Custom", number: Number(customFee) },
+		];
+	}, [feeRateData, customFee]);
+	const [selectFeeRate, setSelectFeeRate] = useState<{ name: string; number: number }>({
+		name: "Slow",
+		number: feeRateData?.hourFee ?? 1,
+	});
 	return (
 		<form
 			autoComplete="off"
@@ -106,13 +128,15 @@ const CreateMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
 					<input type="file" id="addPFP" className="hidden" {...register("avatar")} />
 
 					{!isNil(avatar) && avatar.length !== 0 ? (
-						<img
-							className="image self-center rounded-full"
-							height={"100px"}
-							width={"100px"}
-							src={filesPreview[0]}
-							alt=""
-						/>
+						<div className="bg-inheirt border border-dashed border-main rounded-full w-[100px] h-[100px] grid place-items-center mx-auto">
+							<img
+								className="image self-center rounded-full"
+								height={"100px"}
+								width={"100px"}
+								src={filesPreview[0]}
+								alt=""
+							/>
+						</div>
 					) : (
 						<div
 							onClick={() => {
@@ -125,7 +149,15 @@ const CreateMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
 						</div>
 					)}
 				</div>
-				<div className="flex flex-col gap-2">
+				<CustomFeerate
+					customFee={customFee}
+					setSelectFeeRate={setSelectFeeRate}
+					selectFeeRate={selectFeeRate}
+					handleCustomFeeChange={setCustomFee}
+					feeRateOptions={feeRateOptions}
+				/>
+
+				{/* <div className="flex flex-col gap-2">
 					<div className="text-white">Your Bio</div>
 
 					<textarea
@@ -134,7 +166,7 @@ const CreateMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
 						)}
 						{...register("bio")}
 					/>
-				</div>
+				</div> */}
 			</div>
 
 			<button
