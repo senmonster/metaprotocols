@@ -21,20 +21,20 @@ function TagInput({ tags, onAddTag, onDeleteTag, placeHolder }: IProps) {
 	};
 
 	return (
-		<div className="border rounded-xl p-4">
-			<TagList tags={tags} onDeleteTag={_onDeleteTag} />
-			<div className="flex gap-2 mt-2">
+		<div className="flex flex-col gap-4">
+			<div className="flex gap-2 w-full">
 				<input
-					className="input input-bordered input-sm text-white bg-[black] !outline-none"
+					className="input input-sm w-full  text-white bg-[black] !outline-none"
 					onChange={(e) => setTempV(e.currentTarget.value)}
 					type="text"
 					value={tempV}
 					placeholder={placeHolder}
 				/>
-				<div className="btn btn-sm text-white" onClick={() => onAddTagItem()}>
-					add
+				<div className="btn btn-sm bg-main" onClick={() => onAddTagItem()}>
+					+
 				</div>
 			</div>
+			<TagList tags={tags} onDeleteTag={_onDeleteTag} />
 		</div>
 	);
 }

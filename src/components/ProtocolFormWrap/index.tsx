@@ -33,6 +33,7 @@ const ProtocolFormWrap = () => {
 		console.log("submit form protocol data", data);
 		if (isEmpty(data.tags)) {
 			protocolFormHandle.setError("tags", { type: "Required" });
+			return;
 		}
 		const protocolAttachments =
 			data?.protocolAttachments?.length !== 0 && !isNil(data?.protocolAttachments)

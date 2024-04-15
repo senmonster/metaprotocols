@@ -109,14 +109,14 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 				</div>
 			</div>
 			<dialog id="new_protocol_modal" className="modal">
-				<div className="modal-box bg-[#191C20] py-5 w-[60%]">
+				<div className="modal-box bg-[#191C20] py-5 max-w-[36rem]">
 					<form method="dialog">
 						{/* if there is a button in form, it will close the modal */}
 						<button className="border border-white text-white btn btn-xs btn-circle absolute right-5 top-5.5">
 							✕
 						</button>
 					</form>
-					<h3 className="font-medium text-white text-[16px] text-center">New Protocol</h3>
+					<h3 className="font-medium text-white text-[24px] text-center">New Protocol</h3>
 					<ProtocolFormWrap />
 				</div>
 				<form method="dialog" className="modal-backdrop">

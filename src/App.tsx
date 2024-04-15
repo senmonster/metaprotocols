@@ -70,11 +70,11 @@ function App() {
 				);
 			}
 		});
-		window.addEventListener("beforeunload", (e) => {
-			const confirmMessage = "oos";
-			e.returnValue = confirmMessage;
-			return confirmMessage;
-		});
+		// window.addEventListener("beforeunload", (e) => {
+		// 	const confirmMessage = "oos";
+		// 	e.returnValue = confirmMessage;
+		// 	return confirmMessage;
+		// });
 		//////////////////////////
 		const _btcConnector: BtcConnector = await btcConnect(_wallet);
 

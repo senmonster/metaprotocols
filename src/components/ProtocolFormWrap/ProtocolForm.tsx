@@ -80,6 +80,9 @@ const ProtocolForm = ({
 
 	const [tags, setTags] = useState<string[]>([]);
 	const onAddTag = (tag: string) => {
+		if (tag === "") {
+			return;
+		}
 		protocolFormHandle.clearErrors("tags");
 		setTags((d) => {
 			return [...d, tag];
@@ -105,6 +108,9 @@ const ProtocolForm = ({
 	const [relatedPros, setRelatedPros] = useState<string[]>([]);
 
 	const onAddRelatedPros = (relatedPro: string) => {
+		if (relatedPro === "") {
+			return;
+		}
 		setRelatedPros((d) => {
 			return [...d, relatedPro];
 		});
@@ -120,144 +126,141 @@ const ProtocolForm = ({
 
 	return (
 		<form
-			onSubmit={handleSubmit((data) =>
-				onCreateSubmit({ ...data, tags, relatedProtocols: relatedPros })
-			)}
-			className="mt-8 flex flex-col gap-6"
+			onSubmit={handleSubmit((data) => {
+				onCreateSubmit({ ...data, tags, relatedProtocols: relatedPros });
+			})}
+			className="mt-8 flex flex-col gap-6 font-mono"
 		>
-			<div className="flex flex-col gap-[24px] ">
-				<label
-					className={cls(
-						"input input-bordered input-sm text-white bg-[black] !outline-none flex items-center gap-2 relative ",
-						{
-							"input-error": errors.protocolTitle,
-						}
-					)}
-				>
-					* Title
+			<div className="flex flex-col gap-[30px] ">
+				<label className="text-white relative">
+					<div className="label label-text">Title</div>
 					<input
 						type="text"
-						className="grow"
+						className={cls(
+							"input input-sm bg-[black] !outline-none relative  max-w-[36rem] w-full",
+							{
+								"input-error": errors.protocolTitle,
+							}
+						)}
 						placeholder="Enter here"
 						{...register("protocolTitle", { required: true })}
 					/>
 					{errors.protocolTitle && (
-						<span className="!text-error absolute left-4 top-[32px] text-sm">
+						<span className="!text-error absolute left-2 top-[70px] text-sm">
 							Protocol title can't be empty.
 						</span>
 					)}
 				</label>
 
-				<label
-					className={cls(
-						"input input-bordered input-sm text-white bg-[black] !outline-none flex items-center gap-2 relative",
-						{
-							"input-error": errors.protocolAuthor,
-						}
-					)}
-				>
-					* Author
+				<label className="text-white relative">
+					<div className="label label-text">Author</div>
 					<input
 						type="text"
-						className="grow"
+						className={cls(
+							"input input-sm bg-[black] !outline-none relative  max-w-[36rem] w-full",
+							{
+								"input-error": errors.protocolAuthor,
+							}
+						)}
 						placeholder="Enter here"
 						{...register("protocolAuthor", { required: true })}
 					/>
 					{errors.protocolAuthor && (
-						<span className="!text-error absolute left-4 top-[32px] text-sm">
+						<span className="!text-error absolute left-2 top-[70px] text-sm">
 							Protocol author can't be empty.
 						</span>
 					)}
 				</label>
 
-				<label
-					className={cls(
-						"input input-bordered input-sm text-white bg-[black] !outline-none flex items-center gap-2 relative ",
-						{
-							"input-error": errors.protocolName,
-						}
-					)}
-				>
-					* Name
+				<label className="text-white relative">
+					<div className="label label-text">Name</div>
 					<input
 						type="text"
-						className="grow"
-						placeholder="Enter here."
+						className={cls(
+							"input input-sm bg-[black] !outline-none relative  max-w-[36rem] w-full",
+							{
+								"input-error": errors.protocolName,
+							}
+						)}
+						placeholder="Enter here"
 						{...register("protocolName", { required: true })}
 					/>
 					{errors.protocolName && (
-						<span className="!text-error absolute left-4 top-[32px] text-sm">
-							Protocol Name can't be empty.
+						<span className="!text-error absolute left-2 top-[70px] text-sm">
+							Protocol name can't be empty.
 						</span>
 					)}
 				</label>
 
-				<label
-					className={cls(
-						"input input-bordered input-sm text-white bg-[black] !outline-none flex items-center gap-2 relative ",
-						{
-							"input-error": errors.protocolVersion,
-						}
-					)}
-				>
-					* Version
+				<label className="text-white relative">
+					<div className="label label-text">Version</div>
 					<input
 						type="text"
-						className="grow"
+						className={cls(
+							"input input-sm bg-[black] !outline-none relative  max-w-[36rem] w-full",
+							{
+								"input-error": errors.protocolVersion,
+							}
+						)}
 						placeholder="Enter here"
 						{...register("protocolVersion", { required: true })}
 					/>
 					{errors.protocolVersion && (
-						<span className="!text-error absolute left-4 top-[32px] text-sm">
-							Protocol Version can't be empty.
+						<span className="!text-error absolute left-2 top-[70px] text-sm">
+							Protocol version can't be empty.
 						</span>
 					)}
 				</label>
 
-				<div className="flex items-center justify-between">
-					<div className="text-white text-sm">* Type</div>
-					<select
-						className={cls(
-							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
-							{
+				<div className="flex justify-between gap-2">
+					<div className="flex flex-col gap-2 w-1/2">
+						<div className="text-white text-sm">Type</div>
+						<select
+							className={cls("select select-sm text-white bg-[black] !outline-none", {
 								"select-error": errors.protocolType,
-							}
-						)}
-						{...register("protocolType", { required: true })}
-					>
-						<option>application/json</option>
-						<option>image/apng</option>
-					</select>
-				</div>
-
-				<div className="flex items-center justify-between ">
-					<div className="text-white text-sm">* Encoding</div>
-					<select
-						className={cls(
-							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
-							{
+							})}
+							{...register("protocolType", { required: true })}
+						>
+							<option>application/json</option>
+							<option>image/apng</option>
+						</select>
+					</div>
+					<div className="flex flex-col gap-2 flex-1">
+						<div className="text-white text-sm">Encoding</div>
+						<select
+							className={cls("select select-sm text-white bg-[black] !outline-none", {
 								"select-error": errors.protocolEncoding,
-							}
-						)}
-						{...register("protocolEncoding", { required: true })}
-					>
-						<option>text/plain</option>
-						<option>application/json</option>
-						<option>text/xml</option>
-					</select>
+							})}
+							{...register("protocolEncoding", { required: true })}
+						>
+							<option>text/plain</option>
+							<option>application/json</option>
+							<option>text/xml</option>
+						</select>
+					</div>
 				</div>
 
 				<label className="form-control relative">
-					<div className="label">
-						<span className="label-text text-white">* Introduction</span>
+					<div className="label flex justify-between">
+						<span className="label-text text-white">Introduction</span>
+						<select
+							className={cls(
+								"select select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
+								{
+									"textarea-error": errors.protocolIntroductionType,
+								}
+							)}
+							{...register("protocolIntroductionType", { required: true })}
+						>
+							<option>text/plain</option>
+							<option>application/json</option>
+							<option>text/xml</option>
+						</select>
 					</div>
 					<textarea
-						className={cls(
-							"textarea textarea-bordered text-white bg-[black] !outline-none h-24",
-							{
-								"textarea-error": errors.protocolIntroduction,
-							}
-						)}
+						className={cls("textarea  text-white bg-[black] !outline-none h-24", {
+							"textarea-error": errors.protocolIntroduction,
+						})}
 						placeholder="Enter here"
 						{...register("protocolIntroduction", { required: true })}
 					></textarea>
@@ -269,34 +272,27 @@ const ProtocolForm = ({
 					)}
 				</label>
 
-				<div className="flex items-center justify-between ">
-					<div className="text-white text-sm">* IntroductionType</div>
-					<select
-						className={cls(
-							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
-							{
-								"textarea-error": errors.protocolIntroductionType,
-							}
-						)}
-						{...register("protocolIntroductionType", { required: true })}
-					>
-						<option>text/plain</option>
-						<option>application/json</option>
-						<option>text/xml</option>
-					</select>
-				</div>
-
 				<label className="form-control relative">
-					<div className="label">
-						<span className="label-text text-white">* Content</span>
+					<div className="label flex justify-between">
+						<span className="label-text text-white">Content</span>
+						<select
+							className={cls(
+								"select select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
+								{
+									"select-error": errors.protocolContentType,
+								}
+							)}
+							{...register("protocolContentType", { required: true })}
+						>
+							<option>text/plain</option>
+							<option>application/json</option>
+							<option>text/xml</option>
+						</select>
 					</div>
 					<textarea
-						className={cls(
-							"textarea textarea-bordered text-white bg-[black] !outline-none h-24",
-							{
-								"textarea-error": errors.protocolContent,
-							}
-						)}
+						className={cls("textarea  text-white bg-[black] !outline-none h-24", {
+							"textarea-error": errors.protocolContent,
+						})}
 						placeholder="Enter here"
 						{...register("protocolContent", { required: true })}
 					></textarea>
@@ -307,34 +303,27 @@ const ProtocolForm = ({
 					)}
 				</label>
 
-				<div className="flex items-center justify-between">
-					<div className="text-white text-sm">* ContentType</div>
-					<select
-						className={cls(
-							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
-							{
-								"select-error": errors.protocolContentType,
-							}
-						)}
-						{...register("protocolContentType", { required: true })}
-					>
-						<option>text/plain</option>
-						<option>application/json</option>
-						<option>text/xml</option>
-					</select>
-				</div>
-
 				<label className="form-control relative">
-					<div className="label">
-						<span className="label-text text-white">* Description</span>
+					<div className="label flex justify-between">
+						<span className="label-text text-white">Description</span>
+						<select
+							className={cls(
+								"select select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
+								{
+									"select-error": errors.protocolDescriptionType,
+								}
+							)}
+							{...register("protocolDescriptionType", { required: true })}
+						>
+							<option>text/plain</option>
+							<option>application/json</option>
+							<option>text/xml</option>
+						</select>
 					</div>
 					<textarea
-						className={cls(
-							"textarea textarea-bordered text-white bg-[black] !outline-none h-24",
-							{
-								"textarea-error": errors.protocolDescription,
-							}
-						)}
+						className={cls("textarea  text-white bg-[black] !outline-none h-24", {
+							"textarea-error": errors.protocolDescription,
+						})}
 						placeholder="Enter here"
 						{...register("protocolDescription", { required: true })}
 					></textarea>
@@ -344,36 +333,20 @@ const ProtocolForm = ({
 						</span>
 					)}
 				</label>
-
-				<div className="flex items-center justify-between ">
-					<div className="text-white text-sm">* DescriptionType</div>
-					<select
-						className={cls(
-							"select select-bordered select-sm text-white bg-[black] !outline-none w-[55%] max-w-xs",
-							{
-								"select-error": errors.protocolDescriptionType,
-							}
+				<div className="flex flex-col gap-4">
+					<div className="flex gap-2 items-center">
+						<div className="text-white text-sm">Tags </div>
+						{errors.tags && (
+							<div className="text text-error text-sm">tags can't be empty</div>
 						)}
-						{...register("protocolDescriptionType", { required: true })}
-					>
-						<option>text/plain</option>
-						<option>application/json</option>
-						<option>text/xml</option>
-					</select>
+					</div>
+					<TagInput
+						onAddTag={onAddTag}
+						onDeleteTag={onDeleteTag}
+						tags={tags}
+						placeHolder="enter here"
+					/>
 				</div>
-
-				<div className="flex gap-2 items-center">
-					<div className="text-white text-sm">* Tags </div>
-					{errors.tags && (
-						<div className="text text-error text-sm">tags can't be empty</div>
-					)}
-				</div>
-				<TagInput
-					onAddTag={onAddTag}
-					onDeleteTag={onDeleteTag}
-					tags={tags}
-					placeHolder="enter here"
-				/>
 
 				<div className="collapse bg-base-200 border border-white mr-[8%]">
 					<input type="checkbox" />
@@ -447,7 +420,7 @@ const ProtocolForm = ({
 			</div>
 
 			<button
-				className="btn btn-primary rounded-full font-medium w-[120px] flex self-center"
+				className="btn btn-primary rounded-md font-medium w-full mt-4 flex self-center"
 				type="submit"
 			>
 				Post
