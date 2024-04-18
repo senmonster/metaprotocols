@@ -348,7 +348,7 @@ const ProtocolForm = ({
 					/>
 				</div>
 
-				<div className="collapse bg-base-200 border border-white mr-[8%]">
+				<div className="collapse bg-[black]  mr-[8%]">
 					<input type="checkbox" />
 					<div className="collapse-title text-white text-md font-medium">
 						Click To Show/Hide Optional Parameters
@@ -361,6 +361,7 @@ const ProtocolForm = ({
 								onDeleteTag={onDeleteRelatedPros}
 								tags={relatedPros}
 								placeHolder="enter here"
+								inputBg="#191C20"
 							/>
 							<div className="flex items-center self-start gap-2 mt-2">
 								<div
