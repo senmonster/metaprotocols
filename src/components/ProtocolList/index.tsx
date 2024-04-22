@@ -149,21 +149,23 @@ const ProtocolList = () => {
 					>
 						{protocoles}
 					</div>
-					<button
-						ref={ref}
-						className="btn w-full mt-6"
-						onClick={() => fetchNextPage()}
-						disabled={!hasNextPage || isFetchingNextPage}
-					>
-						{hasNextPage && isFetchingNextPage ? (
-							<div className="flex items-center gap-1">
-								<div>Loading more</div>
-								<span className="loading loading-dots loading-md grid text-white"></span>
-							</div>
-						) : (
-							<div>Nothing more to load </div>
-						)}
-					</button>
+					<div className="grid place-content-center  mt-8">
+						<button
+							ref={ref}
+							className=" bg-[black]/50 rounded-lg p-2.5 px-4"
+							onClick={() => fetchNextPage()}
+							disabled={!hasNextPage || isFetchingNextPage}
+						>
+							{hasNextPage && isFetchingNextPage ? (
+								<div className="flex items-center gap-1 cursor-pointer text-white/90">
+									<div>Loading more</div>
+									<span className="loading loading-dots loading-md grid "></span>
+								</div>
+							) : (
+								<div className="text-white/50">Nothing more to load </div>
+							)}
+						</button>
+					</div>
 				</>
 			)}
 		</div>
