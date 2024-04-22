@@ -130,7 +130,7 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 								return (
 									<div
 										key={d}
-										className="hover:bg-slate-600 text-xs font-thin text-slate-50/30 border border-slate-50/10 rounded-full px-2 pt-0.5 pb-1  text-center"
+										className="hover:bg-slate-600   text-xs font-thin text-main bg-[black] rounded-full px-2.5 pt-0.5 pb-1  text-center"
 									>
 										{d}
 									</div>
