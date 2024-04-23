@@ -58,14 +58,10 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 								</div>
 								<ul
 									tabIndex={0}
-									className="dropdown-content z-[1] menu px-4 py-4 gap-3 shadow bg-main rounded-box w-[170px] border border-[#131519] left-[-86px]"
-									style={{
-										borderRadius: "12px",
-										boxShadow: "0px 4px 10px 0px #D8E2F6",
-									}}
+									className="bg-[#0C0C45] dropdown-content z-[1] menu px-4 py-4 gap-3 shadow-md shadow-blue-800/80 bg-main rounded-box w-[200px] border border-blue-800/80 left-[-86px] text-blue-500"
 								>
 									<li
-										className="hover:bg-[#D8E2F6] rounded-box relative"
+										className="hover:bg-blue-900 rounded-box relative"
 										onClick={onEditProfileStart}
 									>
 										<img
@@ -75,13 +71,13 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 											className="absolute left-0 top-0"
 										/>
 										<a
-											className="text-[#1D2F2F] text-[14px]"
+											className=" text-[14px]"
 											style={{ textIndent: "2.2em" }}
 										>{`Edit Profile`}</a>
 									</li>
-									<div className="border border-[#1D2F2F]/50 w-[80%] mx-auto"></div>
+									<div className="border border-blue-800/50 w-[80%] mx-auto"></div>
 									<li
-										className="hover:bg-[#D8E2F6] rounded-box relative"
+										className="hover:bg-blue-900 rounded-box relative"
 										onClick={onLogout}
 									>
 										<img
@@ -90,10 +86,7 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 											height={55}
 											className="absolute left-0 top-0"
 										/>
-										<a
-											className="text-[#1D2F2F] text-[14px]"
-											style={{ textIndent: "2.5em" }}
-										>
+										<a className=" text-[14px]" style={{ textIndent: "2.5em" }}>
 											Log out
 										</a>
 									</li>
