@@ -18,11 +18,12 @@ const config: Config = {
 	theme: {
 		extend: {
 			colors: {
-				main: "#E0E8F8",
-				secondary: "#daf77380",
 				white: "#fff",
-				black: "#fafafa",
-				card: "#272727",
+				black: "#141414",
+				// dark: "#1E1E1E",
+				// blueDark: "#0202E7",
+				// blueLight: "#056DFA",
+				// blueBg: "#122137",
 			},
 			backgroundImage: {
 				"gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

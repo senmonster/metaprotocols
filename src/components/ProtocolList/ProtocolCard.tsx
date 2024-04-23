@@ -118,67 +118,66 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 		return <div>can't fetch this protocol</div>;
 	}
 	return (
-		<>
-			<div className="card" onClick={() => navigate(`/protocol/${protocolItem.id}`)}>
-				<div className="card-content gap-4 justify-between">
-					<div className="flex flex-col gap-1">
-						<div className="font-mono text-xl font-bold">
-							{parseSummary.protocolTitle}
-						</div>
-						<div className="flex gap-2 items-center">
-							{parseSummary.tags.map((d: string) => {
-								return (
-									<div
-										key={d}
-										className="hover:bg-slate-600 text-xs font-thin text-main bg-[black] rounded-full px-2.5 pt-0.5 pb-1  text-center"
-									>
-										{d}
-									</div>
-								);
-							})}
-						</div>
-					</div>
-					<div className="text-xs text-wrap break-all truncate">
-						{parseSummary.protocolIntroduction.split(".")[0]}
-					</div>
-
-					<div className="flex justify-between items-center">
-						<div className="flex gap-2 items-center">
-							{isNil(currentUserInfoData.data) ? (
-								<div className="avatar placeholder">
-									<div className="bg-[#2B3440] text-[#D7DDE4] rounded-full w-10">
-										<span>{protocolItem!.address.slice(-4, -2)}</span>
-									</div>
-								</div>
-							) : (
-								<CustomAvatar size={8} userInfo={currentUserInfoData.data} />
-							)}
-							<div className="text-gray text-xs">
-								{isNil(currentUserInfoData?.data?.name) ||
-								isEmpty(currentUserInfoData?.data?.name)
-									? "metaid-user-" + protocolItem.address.slice(-4)
-									: currentUserInfoData?.data?.name}
+		<div
+			className="flex group flex-col gap-8  p-6 justify-between cursor-pointer shadow-md shadow-blue-800/80 border-blue-800/80 border hover:border-blue-500 rounded-md"
+			onClick={() => navigate(`/protocol/${protocolItem.id}`)}
+		>
+			<div className="flex flex-col gap-1">
+				<div className="text-slate-300 group-hover:text-slate-200 font-mono text-xl font-bold">
+					{parseSummary.protocolTitle}
+				</div>
+				<div className="flex gap-2 items-center mt-3">
+					{parseSummary.tags.map((d: string) => {
+						return (
+							<div
+								key={d}
+								className="text-blue-600 bg-[#122137]  group-hover:bg-blue-300 text-xs font-thin rounded-full px-2.5 pt-0.5 pb-1  text-center"
+							>
+								{d}
 							</div>
-						</div>
-						<div className="flex gap-2">
-							<Heart
-								size={18}
-								className={cls(
-									{ "text-[red]": isLikeByCurrentUser },
-									"text-slate-50/50 hover:scale-[1.3] duration-1000"
-								)}
-								fill={isLikeByCurrentUser && "red"}
-								onClick={(e) => {
-									e.stopPropagation();
-									handleLike(protocolItem!.id);
-								}}
-							/>
-							{!isNil(currentLikeData) ? currentLikeData.length : null}
-						</div>
-					</div>
+						);
+					})}
 				</div>
 			</div>
-		</>
+			<div className="text-xs text-wrap break-all truncate leading-loose bg-neutral-900 text-slate-400 group-hover:bg-neutral-800  group-hover:text-slate-300 rounded-md p-4">
+				{parseSummary.protocolIntroduction.split(".")[0]}
+			</div>
+
+			<div className="flex justify-between items-center">
+				<div className="flex gap-2 items-center">
+					{isNil(currentUserInfoData.data) ? (
+						<div className="avatar placeholder">
+							<div className="bg-[#2B3440] text-[#D7DDE4] rounded-full w-10">
+								<span>{protocolItem!.address.slice(-4, -2)}</span>
+							</div>
+						</div>
+					) : (
+						<CustomAvatar size={8} userInfo={currentUserInfoData.data} />
+					)}
+					<div className="text-gray text-xs">
+						{isNil(currentUserInfoData?.data?.name) ||
+						isEmpty(currentUserInfoData?.data?.name)
+							? "metaid-user-" + protocolItem.address.slice(-4)
+							: currentUserInfoData?.data?.name}
+					</div>
+				</div>
+				<div className="flex gap-2">
+					<Heart
+						size={18}
+						className={cls(
+							{ "text-[red]": isLikeByCurrentUser },
+							"text-slate-50/50 hover:scale-[1.3] duration-1000"
+						)}
+						fill={isLikeByCurrentUser && "red"}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleLike(protocolItem!.id);
+						}}
+					/>
+					{!isNil(currentLikeData) ? currentLikeData.length : null}
+				</div>
+			</div>
+		</div>
 	);
 };
 

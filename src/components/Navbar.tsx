@@ -6,7 +6,7 @@ import { connectedAtom, initStillPoolAtom, userInfoAtom } from "../store/user";
 import { checkMetaletConnected, checkMetaletInstalled } from "../utils/wallet";
 import ProtocolFormWrap from "./ProtocolFormWrap";
 import CustomAvatar from "./CustomAvatar";
-import { PencilLine } from "lucide-react";
+import { Plus } from "lucide-react";
 
 type IProps = {
 	onWalletConnectStart: () => Promise<void>;
@@ -35,18 +35,20 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 	// console.log("userInfo", userInfo);
 	return (
 		<>
-			<div className="z-10 navbar p-3   bg-main absolute top-0">
-				<div className="container flex justify-between px-6">
-					<Link to={"/"} className="text-[30px] font-normal	font-['Impact']">
-						MetaProtocols
+			<div className="z-10 navbar p-3   bg-main absolute top-0 font-mono">
+				<div className="container flex justify-between px-6 items-center">
+					<Link to={"/"} className="w-[200px] h-[50px] grid place-items-center">
+						<img src="/header-logo.png" className="pt-2" />
 					</Link>
 
 					<div className="flex items-center gap-2">
-						<PencilLine
-							className="border rounded-full text-main bg-[black] p-2 cursor-pointer"
-							size={45}
+						<button
+							className="btn cursor-pointer hover:border-none hover:bg-neutral-600 bg-neutral-900 border-none rounded-xl font-medium w-[150px]"
 							onClick={onProtocolStart}
-						/>
+						>
+							<Plus size={18} onClick={onProtocolStart} />
+							Add
+						</button>
 
 						{connected ? (
 							<div className="dropdown dropdown-hover">
@@ -99,7 +101,7 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 							</div>
 						) : (
 							<div
-								className="btn btn-outline hover:bg-[black] hover:text-main rounded-full font-medium w-[180px]"
+								className="btn btn-outline bg-blue-800 border-none hover:bg-blue-500 font-medium rounded-xl"
 								onClick={onWalletConnectStart}
 							>
 								Connect Wallet

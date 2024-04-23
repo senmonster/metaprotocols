@@ -10,7 +10,7 @@ const Home = () => {
 		<main className="relative">
 			{/* <RecommendUsers /> */}
 			{stillPool && (
-				<div className="absolute text-[13px] top-[-20px] text-main">
+				<div className="absolute text-[13px] top-[-20px] text-blue-600 flex gap-4 items-center">
 					<div>
 						Your MetaID TX hasn't been confirmed yet. You can start using the platform
 						once your MetaID TX is confirmed.

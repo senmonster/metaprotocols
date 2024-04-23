@@ -119,56 +119,71 @@ const ProtocolList = () => {
 	};
 
 	return (
-		<div>
-			<div className="flex gap-2 items-center place-content-center mt-0">
-				<Sparkle className="text-main" />
-				<div className="text-white text-[36px] font-['Impact']">
-					{"Build Dapp With MetaProtocols"}
-				</div>
+		<>
+			<div className="flex gap-2 items-center place-content-center mt-0 relative pt-4">
+				<img src="/home-info.png" className="w-[600px] h-[90px]" />
 				{!isRefetching ? (
-					<RotateCw
-						className="text-gray-500 absolute right-0 cursor-pointer"
-						onClick={handleRefresh}
-					/>
+					// <RotateCw
+					// 	className="text-gray-500 absolute left-0 cursor-pointer"
+					// 	onClick={handleRefresh}
+					// />
+					<div
+						className="absolute left-0 tooltip tooltip-top tooltip-primary"
+						data-tip="Click to refetch new data."
+					>
+						<button
+							className="btn btn-sm btn-ghost text-gray-400 hover:bg-gray-700 bg-gray-900 hover:border-none"
+							onClick={handleRefresh}
+						>
+							refetch
+						</button>
+					</div>
 				) : (
-					<div className="loading loading-dots absolute right-0 text-gray text-sm "></div>
+					<div className="btn btn-ghost absolute left-2 text-gray-500">
+						refetching
+						<div className="loading loading-dots text-sm "></div>
+					</div>
 				)}
-				<Sparkle className="text-main" />
 			</div>
 
 			{isLoading ? (
-				<div className="flex items-center gap-2 justify-center h-[200px]">
+				<div className="flex items-center gap-2 justify-center h-[500px]">
 					<div>Protocol Feed is Coming</div>
 					<span className="loading loading-bars loading-md grid text-white"></span>
 				</div>
 			) : (
 				<>
 					<div
-						id="cards"
-						className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-5 gap-3 mt-6"
+						// id="cards"
+						className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-4 gap-8 mt-12"
 					>
 						{protocoles}
 					</div>
-					<div className="grid place-content-center  mt-8">
+					<div className="grid place-content-end mt-8">
 						<button
 							ref={ref}
-							className=" bg-[black]/50 rounded-lg p-2.5 px-4"
+							className="rounded-lg p-2.5 px-4"
 							onClick={() => fetchNextPage()}
 							disabled={!hasNextPage || isFetchingNextPage}
 						>
 							{hasNextPage && isFetchingNextPage ? (
 								<div className="flex items-center gap-1 cursor-pointer text-white/90">
-									<div>Loading more</div>
-									<span className="loading loading-dots loading-md grid "></span>
+									<div>More</div>
+									<span className="loading loading-dots loading-md grid"></span>
 								</div>
 							) : (
-								<div className="text-white/50">Nothing more to load </div>
+								<div
+									className="tooltip tooltip-left tooltip-primary"
+									data-tip="Nothing More To Load."
+								>
+									<div className="text-white/50 cursor-not-allowed">More</div>
+								</div>
 							)}
 						</button>
 					</div>
 				</>
 			)}
-		</div>
+		</>
 	);
 };
 

@@ -29,13 +29,13 @@ const Protocol = () => {
 		<div>
 			<BackButton />
 
-			<div className="bg-[black]  border border-slate-50/10 rounded-lg w-full h-full p-10 flex flex-col gap-4">
+			<div className="bg-[black/50]  border border-slate-50/10 rounded-lg w-full h-full p-10 flex flex-col gap-4">
 				<div className="flex gap-6 items-center">
-					<div className="text-[36px]">{parseSummary?.protocolTitle} </div>
+					<div className="text-[36px]">{parseSummary?.protocolTitle}</div>
 					<div className="flex gap-2 mt-1">
 						{(parseSummary?.tags ?? []).map((d: string) => {
 							return (
-								<div className="bg-[#0B1A30] text-sm font-normal text-[#056DFA] rounded-full px-4 pt-0.5 pb-1  text-center">
+								<div className="text-blue-600 bg-[#122137]  text-sm font-thin rounded-full px-2.5 pt-0.5 pb-1  text-center">
 									{d}
 								</div>
 							);
@@ -63,7 +63,7 @@ const Protocol = () => {
 						<img
 							src={`/detail-encoding-icon.png`}
 							alt="logo"
-							className="w-[30px] h-[30px] mt-1"
+							className="w-[30px] h-[30px]"
 						/>
 						<div className="">encoding: {parseSummary?.protocolEncoding} </div>
 					</div>
@@ -71,22 +71,22 @@ const Protocol = () => {
 						<img
 							src={`/detail-brfcid-icon.png`}
 							alt="logo"
-							className="w-[30px] h-[30px]"
+							className="w-[32px] h-[32px]"
 						/>
 						<div>brfcId: {parseSummary?.protocolHASHID} </div>
 					</div>
 				</div>
 				<div className="border border-b-0 border-gray-500/50 my-8"></div>
 				<div className="text-[24px]">Protocol Content</div>
-				<div className="bg-[#131314] p-8 rounded-lg">
+				<div className="bg-neutral-900 p-8 rounded-lg">
 					<JsonFormatter
 						json={parseSummary?.protocolContent}
 						tabWith={4}
 						jsonStyle={jsonStyle}
 					/>
 				</div>
-				<div>Protocol Description</div>
-				<div className="bg-[#131314] p-8 rounded-lg">
+				<div className="text-[24px]">Protocol Description</div>
+				<div className="bg-neutral-900 p-8 rounded-lg">
 					<div>{parseSummary?.protocolDescription}</div>
 				</div>
 			</div>
