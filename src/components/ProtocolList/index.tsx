@@ -1,4 +1,3 @@
-import { RotateCw, Sparkle } from "lucide-react";
 import { useEffect, useState } from "react";
 import ProtocolCard from "./ProtocolCard";
 import { fetchProtocols } from "../../api/protocol";
