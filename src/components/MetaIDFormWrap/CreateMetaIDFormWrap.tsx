@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { BtcConnector } from "@metaid/metaid/dist/core/connector/btc";
 import CreateMetaIdInfoForm from "./CreateMetaIdInfoForm";
 import { useAtomValue } from "jotai";
-import { walletAtom } from "../../store/user";
+import { globalFeeRateAtom, walletAtom } from "../../store/user";
 import { isNil } from "ramda";
 
 export type MetaidUserInfo = {
@@ -23,6 +23,8 @@ const CreateMetaIDFormWrap = ({
 	btcConnector: BtcConnector;
 	onWalletConnectStart: () => void;
 }) => {
+	const globalFeeRate = useAtomValue(globalFeeRateAtom);
+
 	const [isCreating, setIsCreating] = useState(false);
 	const wallet = useAtomValue(walletAtom);
 	const handleCreateMetaID = async (userInfo: MetaidUserInfo) => {
@@ -34,19 +36,21 @@ const CreateMetaIDFormWrap = ({
 		);
 		setIsCreating(true);
 
-		const res = await btcConnector.createMetaid({ ...userInfo }).catch((error: any) => {
-			setIsCreating(false);
-			console.log("create metaid error ", "message", TypeError(error).message);
-			const errorMessage = TypeError(error).message;
+		const res = await btcConnector
+			.createMetaid({ ...userInfo, feeRate: Number(globalFeeRate) })
+			.catch((error: any) => {
+				setIsCreating(false);
+				console.log("create metaid error ", "message", TypeError(error).message);
+				const errorMessage = TypeError(error).message;
 
-			const toastMessage = errorMessage.includes("Cannot read properties of undefined")
-				? "User Canceled"
-				: errorMessage;
-			toast.error(toastMessage, {
-				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+				const toastMessage = errorMessage.includes("Cannot read properties of undefined")
+					? "User Canceled"
+					: errorMessage;
+				toast.error(toastMessage, {
+					className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+				});
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			});
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		});
 
 		if (isNil(res?.metaid)) {
 			toast.error("Create Failed", {

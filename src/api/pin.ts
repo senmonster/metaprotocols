@@ -1,44 +1,20 @@
-import axios from 'axios';
-
-const BASE_METAID_TEST_URL = `https://man-test.metaid.io`;
-
-export type Pin = {
-  id: string;
-  number: number;
-  rootTxId: string;
-  address: string;
-  output: string;
-  outputValue: number;
-  timestamp: number;
-  genesisFee: number;
-  genesisHeight: number;
-  genesisTransaction: string;
-  txInIndex: number;
-  txInOffset: number;
-  operation: string;
-  path: string;
-  parentPath: string;
-  encryption: string;
-  version: string;
-  contentType: string;
-  contentBody: string;
-  contentLength: number;
-  contentSummary: string;
-};
+import axios from "axios";
+import { BtcNetwork, MAN_BASE_URL_MAPPING, Pin } from "./request";
 
 export async function getPinDetailByPid({
-  pid,
+	pid,
+	network,
 }: {
-  pid: string;
-  network?: 'livenet' | 'testnet';
+	pid: string;
+	network: BtcNetwork;
 }): Promise<Pin | null> {
-  const url = `${BASE_METAID_TEST_URL}/api/pin/${pid}`;
+	const url = `${MAN_BASE_URL_MAPPING[network]}/api/pin/${pid}`;
 
-  try {
-    const data = await axios.get(url).then((res) => res.data);
-    return data.data;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+	try {
+		const data = await axios.get(url).then((res) => res.data);
+		return data.data;
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
 }

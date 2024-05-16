@@ -2,6 +2,7 @@ import { type BtcConnector } from "@metaid/metaid/dist/core/connector/btc";
 import { MetaIDWalletForBtc } from "@metaid/metaid/dist/wallets/metalet/btcWallet";
 import { atom } from "jotai";
 import { isNil } from "ramda";
+import { BtcNetwork } from "../api/request";
 
 export type UserInfo = {
 	number: number;
@@ -37,4 +38,6 @@ export const balanceAtom = atom({
 	unconfirmed: 0,
 	total: 0,
 });
-export const networkAtom = atom<string>("livenet");
+
+export const networkAtom = atom<BtcNetwork>("testnet");
+export const globalFeeRateAtom = atom<string>("60");

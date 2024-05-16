@@ -20,7 +20,7 @@ export const conirmMetaletTestnet = async () => {
 		toast.error(errors.SWITCH_TESTNET_ALERT, {
 			className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
 		});
-		await window.metaidwallet.switchNetwork("testnet");
+		await window.metaidwallet.switchNetwork({ network: "testnet" });
 
 		throw new Error(errors.SWITCH_TESTNET_ALERT);
 	}

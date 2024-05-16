@@ -1319,15 +1319,16 @@
   dependencies:
     inquirer "^9.2.11"
 
-"@metaid/metaid@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/@metaid/metaid/-/metaid-1.0.0.tgz#d8d54b3042fa4162652042818cc33bdaabba39b2"
-  integrity sha512-vsWxpG1bQ0VcCc/t/eCX/9rFXyv3Drlcy0Yt03rIaIKmeS0hDh6XkTMf+rHBjG7OyOvvE0ksxSqAY3z3IIa1VQ==
+"@metaid/metaid@^1.1.5":
+  version "1.1.5"
+  resolved "https://registry.npmjs.org/@metaid/metaid/-/metaid-1.1.5.tgz#310e6716e9a537e6525228a109d0904b6942f04d"
+  integrity sha512-TR3WzLNAwZ/yES28j0OnMncPzTzNqkQJj0Gx4+BKkFzA7yTwr8FfpcL4ae3U42dh1GcU3ReL35cGfP7el+DWTA==
   dependencies:
     "@bitcoin-js/tiny-secp256k1-asmjs" "^2.2.3"
     "@metaid/metaid-cli" "0.0.2"
     "@okxweb3/crypto-lib" "^1.0.1"
     "@scure/bip39" "^1.2.2"
+    "@types/ramda" "^0.29.12"
     axios "^1.5.0"
     bip32 "^4.0.0"
     bip39 "^3.1.0"
@@ -1756,6 +1757,13 @@
   integrity sha512-jm1+PmNOpE7aPS+mMcuB4a72VkCXUJqPSaQRu2YqR8MbsFfaowYXgKxc7bluYdDpRHNXT5Z+xu+Lgr3/ml6wSA==
   dependencies:
     types-ramda "^0.29.9"
+
+"@types/ramda@^0.29.12":
+  version "0.29.12"
+  resolved "https://registry.npmjs.org/@types/ramda/-/ramda-0.29.12.tgz#fd8a23849176c6c1b3510243b64084c067e6a48f"
+  integrity sha512-sgIEjpJhdQPB52gDF4aphs9nl0xe54CR22DPdWqT8gQHjZYmVApgA0R3/CpMbl0Y8az2TEZrPNL2zy0EvjbkLA==
+  dependencies:
+    types-ramda "^0.29.10"
 
 "@types/react-dom@^18.2.22":
   version "18.2.22"
@@ -5767,6 +5775,13 @@ typeforce@^1.11.3, typeforce@^1.11.5:
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/typeforce/-/typeforce-1.18.0.tgz#d7416a2c5845e085034d70fcc5b6cc4a90edbfdc"
   integrity sha512-7uc1O8h1M1g0rArakJdf0uLRSSgFcYexrVoKo+bzJd32gd4gDy2L/Z+8/FjPnU9ydY3pEnVPtr9FyscYY60K1g==
+
+types-ramda@^0.29.10:
+  version "0.29.10"
+  resolved "https://registry.npmjs.org/types-ramda/-/types-ramda-0.29.10.tgz#820432905b820301c74f6396f07aa2359b41cde4"
+  integrity sha512-5PJiW/eiTPyXXBYGZOYGezMl6qj7keBiZheRwfjJZY26QPHsNrjfJnz0mru6oeqqoTHOni893Jfd6zyUXfQRWg==
+  dependencies:
+    ts-toolbelt "^9.6.0"
 
 types-ramda@^0.29.9:
   version "0.29.9"

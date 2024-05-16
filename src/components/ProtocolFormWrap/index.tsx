@@ -13,13 +13,13 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { btcConnectorAtom } from "../../store/user";
 import { sleep } from "../../utils/time";
-import { CreateOptions } from "@metaid/metaid/dist/core/entity/btc";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { image2Attach } from "../../utils/file";
 import { ProtocolItem } from "../../types";
 import { createBrfcid } from "../../utils/crypto";
 import { temp_protocol } from "../../utils/mockData";
 import { fetchFeeRate } from "../../api/fee";
+import { CreateOptions } from "@metaid/metaid";
 const ProtocolFormWrap = () => {
 	const protocolEntity = useAtomValue(protocolEntityAtom);
 	const btcConnector = useAtomValue(btcConnectorAtom);

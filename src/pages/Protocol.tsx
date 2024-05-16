@@ -6,11 +6,15 @@ import { ProtocolItem } from "../types";
 import JsonFormatter from "react-json-formatter";
 
 import "./styles.css";
+import { useAtomValue } from "jotai";
+import { networkAtom } from "../store/user";
 const Protocol = () => {
+	const network = useAtomValue(networkAtom);
+
 	const { id: pinId } = useParams();
 	const { data: protocolDetailData } = useQuery({
 		queryKey: ["protocol", pinId],
-		queryFn: () => getPinDetailByPid({ pid: pinId! }),
+		queryFn: () => getPinDetailByPid({ pid: pinId!, network }),
 	});
 
 	const summary = protocolDetailData?.contentSummary;

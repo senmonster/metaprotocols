@@ -7,7 +7,13 @@ import cls from "classnames";
 import { Pin } from ".";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // import { getPinDetailByPid } from '../../api/pin';
-import { btcConnectorAtom, connectedAtom, initStillPoolAtom } from "../../store/user";
+import {
+	btcConnectorAtom,
+	connectedAtom,
+	globalFeeRateAtom,
+	initStillPoolAtom,
+	networkAtom,
+} from "../../store/user";
 import { useAtomValue } from "jotai";
 import CustomAvatar from "../CustomAvatar";
 // import { sleep } from '../../utils/time';
@@ -23,6 +29,7 @@ type IProps = {
 
 const ProtocolCard = ({ protocolItem }: IProps) => {
 	const connected = useAtomValue(connectedAtom);
+	const network = useAtomValue(networkAtom);
 
 	const btcConnector = useAtomValue(btcConnectorAtom);
 	const stillPool = useAtomValue(initStillPoolAtom);
@@ -33,6 +40,8 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 	const isSummaryJson = summary.startsWith("{") && summary.endsWith("}");
 	const parseSummary = isSummaryJson ? JSON.parse(summary) : {};
 
+	const globalFeeRate = useAtomValue(globalFeeRateAtom);
+
 	// const attachPids = isSummaryJson
 	//   ? (parseSummary?.attachments ?? []).map(
 	//       (d: string) => d.split('metafile://')[1]
@@ -40,8 +49,8 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 	//   : [];
 
 	const { data: currentLikeData } = useQuery({
-		queryKey: ["payLike", protocolItem!.id],
-		queryFn: () => fetchCurrentProtocolLikes(protocolItem!.id),
+		queryKey: ["payLike", protocolItem!.id, network],
+		queryFn: () => fetchCurrentProtocolLikes({ network, pinId: protocolItem!.id }),
 	});
 	const isLikeByCurrentUser = (currentLikeData ?? []).find(
 		(d) => d.pinAddress === btcConnector?.address
@@ -49,7 +58,7 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 
 	const currentUserInfoData = useQuery({
 		queryKey: ["userInfo", protocolItem!.address],
-		queryFn: () => btcConnector?.getUser(protocolItem!.address),
+		queryFn: () => btcConnector?.getUser({ currentAddress: protocolItem!.address, network }),
 	});
 	// console.log("current user data", currentUserInfoData.data);
 
@@ -90,6 +99,7 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 					},
 				],
 				noBroadcast: "no",
+				feeRate: Number(globalFeeRate),
 			});
 			console.log("likeRes", likeRes);
 			if (!isNil(likeRes?.revealTxIds[0])) {

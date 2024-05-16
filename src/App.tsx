@@ -10,7 +10,13 @@ import { MetaletWalletForBtc, btcConnect } from "@metaid/metaid";
 import { BtcConnector } from "@metaid/metaid/dist/core/connector/btc";
 
 import { useAtom, useSetAtom } from "jotai";
-import { btcConnectorAtom, connectedAtom, userInfoAtom, walletAtom } from "./store/user";
+import {
+	btcConnectorAtom,
+	connectedAtom,
+	networkAtom,
+	userInfoAtom,
+	walletAtom,
+} from "./store/user";
 import { protocolEntityAtom } from "./store/protocol";
 import { errors } from "./utils/errors";
 import { isNil } from "ramda";
@@ -18,6 +24,7 @@ import { checkMetaletInstalled, conirmMetaletTestnet } from "./utils/wallet";
 import CreateMetaIDModal from "./components/MetaIDFormWrap/CreateMetaIDModal";
 import EditMetaIDModal from "./components/MetaIDFormWrap/EditMetaIDModal";
 import { useEffect } from "react";
+import { BtcNetwork } from "./api/request";
 
 function App() {
 	const setConnected = useSetAtom(connectedAtom);
@@ -25,6 +32,7 @@ function App() {
 	const [btcConnector, setBtcConnector] = useAtom(btcConnectorAtom);
 	const setProtocolEntity = useSetAtom(protocolEntityAtom);
 	const setUserInfo = useSetAtom(userInfoAtom);
+	const [network, setNetwork] = useAtom(networkAtom);
 
 	const onLogout = () => {
 		setConnected(false);
@@ -57,27 +65,29 @@ function App() {
 				}
 			);
 		});
-		window.metaidwallet.on("networkChanged", (network: string) => {
-			console.log("network", network);
-			if (network !== "testnet") {
-				onLogout();
-				toast.error(
-					"Wallet Network Changed ---- You have been automatically logged out of your current BitProtocol account. Please Switch to Testnet login again...",
-					{
-						className:
-							"!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
-					}
-				);
-			}
-		});
+		// window.metaidwallet.on("networkChanged", (network: string) => {
+		// 	console.log("network", network);
+		// 	if (network !== "testnet") {
+		// 		onLogout();
+		// 		toast.error(
+		// 			"Wallet Network Changed ---- You have been automatically logged out of your current BitProtocol account. Please Switch to Testnet login again...",
+		// 			{
+		// 				className:
+		// 					"!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+		// 			}
+		// 		);
+		// 	}
+		// });
 		// window.addEventListener("beforeunload", (e) => {
 		// 	const confirmMessage = "oos";
 		// 	e.returnValue = confirmMessage;
 		// 	return confirmMessage;
 		// });
 		//////////////////////////
-		const _btcConnector: BtcConnector = await btcConnect(_wallet);
-
+		const _btcConnector: BtcConnector = await btcConnect({
+			network,
+			wallet: _wallet,
+		});
 		setBtcConnector(_btcConnector as BtcConnector);
 
 		// const doc_modal = document.getElementById(
@@ -89,7 +99,7 @@ function App() {
 			const doc_modal = document.getElementById("create_metaid_modal") as HTMLDialogElement;
 			doc_modal.showModal();
 		} else {
-			const resUser = await _btcConnector.getUser();
+			const resUser = await _btcConnector.getUser({ network });
 			// console.log("user now", resUser);
 			setUserInfo(resUser);
 			setConnected(true);
@@ -100,7 +110,7 @@ function App() {
 	};
 
 	const getProtocolEntity = async () => {
-		const _btcConnector: BtcConnector = await btcConnect();
+		const _btcConnector: BtcConnector = await btcConnect({ network });
 		setBtcConnector(_btcConnector);
 		setProtocolEntity(await _btcConnector.use("metaprotocols"));
 	};
@@ -108,6 +118,20 @@ function App() {
 	useEffect(() => {
 		getProtocolEntity();
 	}, []);
+
+	useEffect(() => {
+		if (!isNil(window?.metaidwallet)) {
+			window.metaidwallet.on("networkChanged", async (network: BtcNetwork) => {
+				toast.error("Wallet Network Changed!", {
+					className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+				});
+				setNetwork(network ?? "testnet");
+				// await window.metaidwallet.switchNetwork(
+				//   network === ' testnet' ? 'regtest' : 'testnet'
+				// );
+			});
+		}
+	}, [window?.metaidwallet]);
 
 	// const handleTest = async () => {
 	//   console.log('connected', connected);
