@@ -23,6 +23,7 @@ import { checkMetaletConnected, checkMetaletInstalled } from "../../utils/wallet
 // import { temp_protocol } from '../../utils/mockData';
 import "./styles.css";
 import { useNavigate } from "react-router-dom";
+import { errors } from "../../utils/errors";
 type IProps = {
 	protocolItem: Pin | undefined;
 };
@@ -81,6 +82,7 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 		await checkMetaletInstalled();
 		await checkMetaletConnected(connected);
 		if (stillPool) {
+			toast.error(errors.STILL_MEMPOOL_ALERT);
 			return;
 		}
 		if (isLikeByCurrentUser) {
