@@ -69,7 +69,7 @@ export async function fetchCurrentProtocolLikes({
 
 	try {
 		const data = await axios
-			.post(`${MAN_BASE_URL_MAPPING[network]}/api/btc/generalQuery`, body)
+			.post(`${MAN_BASE_URL_MAPPING[network]}/api/generalQuery`, body)
 			.then((res) => res.data);
 		return data.data;
 	} catch (error) {

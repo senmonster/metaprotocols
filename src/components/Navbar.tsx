@@ -6,7 +6,7 @@ import { connectedAtom, globalFeeRateAtom, initStillPoolAtom, userInfoAtom } fro
 import { checkMetaletConnected, checkMetaletInstalled } from "../utils/wallet";
 import ProtocolFormWrap from "./ProtocolFormWrap";
 import CustomAvatar from "./CustomAvatar";
-import { Plus } from "lucide-react";
+import { SquarePlus } from "lucide-react";
 import { errors } from "../utils/errors";
 import { toast } from "react-toastify";
 // import { BtcNetwork } from "../api/request";
@@ -131,10 +131,10 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 							}}
 						/>
 						<button
-							className="btn cursor-pointer hover:border-none hover:bg-neutral-600 bg-neutral-900 border-none rounded-xl font-medium w-[150px]"
+							className="btn cursor-pointer !border !border-blue-800  hover:bg-blue-800 bg-neutral-900 rounded-xl font-medium w-[130px]"
 							onClick={onProtocolStart}
 						>
-							<Plus size={18} onClick={onProtocolStart} />
+							<SquarePlus size={18} onClick={onProtocolStart} />
 							Add
 						</button>
 
@@ -146,10 +146,10 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 								</div>
 								<ul
 									tabIndex={0}
-									className="bg-[#0C0C45] dropdown-content z-[1] menu px-4 py-4 gap-3 shadow-md shadow-blue-800/80 bg-main rounded-box w-[200px] border border-blue-800/80 left-[-86px] text-blue-500"
+									className="bg-[#2B2BFF] dropdown-content z-[1] menu px-4 py-4 gap-3 shadow-md shadow-blue-800/80 bg-main rounded-box w-[200px] border border-blue-800/80 left-[-86px] text-blue-500"
 								>
 									<li
-										className="hover:bg-blue-900 rounded-box relative"
+										className="hover:bg-blue-500 rounded-box relative"
 										onClick={onEditProfileStart}
 									>
 										<img
@@ -159,13 +159,13 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 											className="absolute left-0 top-0"
 										/>
 										<a
-											className=" text-[14px]"
+											className="text-white text-[14px] mt-0.5"
 											style={{ textIndent: "2.2em" }}
 										>{`Edit Profile`}</a>
 									</li>
 									<div className="border border-blue-800/50 w-[80%] mx-auto"></div>
 									<li
-										className="hover:bg-blue-900 rounded-box relative"
+										className="hover:bg-blue-500 rounded-box relative"
 										onClick={onLogout}
 									>
 										<img
@@ -174,7 +174,10 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 											height={55}
 											className="absolute left-0 top-0"
 										/>
-										<a className=" text-[14px]" style={{ textIndent: "2.5em" }}>
+										<a
+											className="text-white text-[14px] mt-0.5"
+											style={{ textIndent: "2.5em" }}
+										>
 											Log out
 										</a>
 									</li>

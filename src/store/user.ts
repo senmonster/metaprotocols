@@ -13,6 +13,7 @@ export type UserInfo = {
 	bio: string;
 	soulbondToken: string;
 	unconfirmed: string;
+	metaid: string;
 };
 
 export const connectedAtom = atom(false);

@@ -17,7 +17,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { image2Attach } from "../../utils/file";
 import { ProtocolItem } from "../../types";
 import { createBrfcid } from "../../utils/crypto";
-import { temp_protocol } from "../../utils/mockData";
+// import { temp_protocol } from "../../utils/mockData";
 import { fetchFeeRate } from "../../api/fee";
 import { CreateOptions } from "@metaid/metaid";
 const ProtocolFormWrap = () => {
@@ -53,7 +53,7 @@ const ProtocolFormWrap = () => {
 	) => {
 		setIsAdding(true);
 
-		console.log("protocol data", temp_protocol);
+		console.log("protocol data", protocol);
 		const protocolHASHID = createBrfcid({
 			title: protocol.protocolTitle,
 			author: protocol.protocolAuthor,
@@ -62,7 +62,7 @@ const ProtocolFormWrap = () => {
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const finalBody: ProtocolItem = {
-				...temp_protocol,
+				...protocol,
 				protocolHASHID,
 				protocolAttachments: [],
 				tags: ["meta", "protocols"],
