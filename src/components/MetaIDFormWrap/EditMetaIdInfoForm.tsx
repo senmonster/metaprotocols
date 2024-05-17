@@ -10,6 +10,8 @@ import { useEffect, useMemo, useState } from "react";
 import CustomFeerate from "../CustomFeerate";
 import { useQuery } from "@tanstack/react-query";
 import { fetchFeeRate } from "../../api/fee";
+import { globalFeeRateAtom } from "../../store/user";
+import { useAtomValue } from "jotai";
 
 export type FormUserInfo = {
 	name: string;
@@ -23,6 +25,7 @@ type IProps = {
 };
 
 const EditMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
+	const globalFeerate = useAtomValue(globalFeeRateAtom);
 	const {
 		register,
 		handleSubmit,
@@ -68,16 +71,16 @@ const EditMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
 		queryFn: () => fetchFeeRate({ netWork: "testnet" }),
 	});
 
-	const [customFee, setCustomFee] = useState<string>("1");
+	const [customFee, setCustomFee] = useState<string>(globalFeerate);
 
 	const feeRateOptions = useMemo(() => {
 		return [
-			{ name: "Slow", number: feeRateData?.hourFee ?? 1 },
-			{ name: "Avg", number: feeRateData?.halfHourFee ?? 1 },
-			{ name: "Fast", number: feeRateData?.fastestFee ?? 1 },
+			{ name: "Slow", number: feeRateData?.hourFee ?? Number(globalFeerate) },
+			{ name: "Avg", number: feeRateData?.halfHourFee ?? Number(globalFeerate) },
+			{ name: "Fast", number: feeRateData?.fastestFee ?? Number(globalFeerate) },
 			{ name: "Custom", number: Number(customFee) },
 		];
-	}, [feeRateData, customFee]);
+	}, [feeRateData, customFee, globalFeerate]);
 	const [selectFeeRate, setSelectFeeRate] = useState<{ name: string; number: number }>({
 		name: "Slow",
 		number: feeRateData?.hourFee ?? 1,

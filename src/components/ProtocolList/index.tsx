@@ -7,9 +7,8 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { protocolEntityAtom } from "../../store/protocol";
 import { isNil } from "ramda";
 import { BtcEntity } from "@metaid/metaid/dist/core/entity/btc";
-import { btcConnect } from "@metaid/metaid";
-import { BtcConnector } from "@metaid/metaid/dist/core/connector/btc";
-import { networkAtom, userInfoAtom, walletAtom } from "../../store/user";
+// import { btcConnect } from "@metaid/metaid";
+import { btcConnectorAtom, networkAtom, userInfoAtom } from "../../store/user";
 // import './styles.css';
 export type Pin = {
 	id: string;
@@ -40,7 +39,8 @@ const ProtocolList = () => {
 	const [total, setTotal] = useState<null | number>(null);
 	const network = useAtomValue(networkAtom);
 	const setUserInfo = useSetAtom(userInfoAtom);
-	const _wallet = useAtomValue(walletAtom);
+	// const _wallet = useAtomValue(walletAtom);
+	const btcConnector = useAtomValue(btcConnectorAtom);
 
 	const protocolEntity = useAtomValue(protocolEntityAtom);
 	const getTotal = async (buzzEntity: BtcEntity) => {
@@ -113,11 +113,11 @@ const ProtocolList = () => {
 	const handleRefresh = async () => {
 		refetch();
 		// const _wallet = await MetaletWalletForBtc.create();
-		const _btcConnector: BtcConnector = await btcConnect({
-			network,
-			wallet: _wallet ?? undefined,
-		});
-		const _user = await _btcConnector.getUser({ network });
+		// const _btcConnector: BtcConnector = await btcConnect({
+		// 	network,
+		// 	wallet: _wallet ?? undefined,
+		// });
+		const _user = await btcConnector!.getUser({ network });
 
 		setUserInfo(_user);
 	};
