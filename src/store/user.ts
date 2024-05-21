@@ -1,7 +1,6 @@
 import { type BtcConnector } from "@metaid/metaid/dist/core/connector/btc";
 import { MetaIDWalletForBtc } from "@metaid/metaid/dist/wallets/metalet/btcWallet";
 import { atom } from "jotai";
-import { isNil } from "ramda";
 import { BtcNetwork } from "../api/request";
 
 export type UserInfo = {
@@ -19,11 +18,6 @@ export type UserInfo = {
 export const connectedAtom = atom(false);
 export const btcConnectorAtom = atom<BtcConnector | null>(null);
 export const userInfoAtom = atom<UserInfo | null>(null);
-
-export const initStillPoolAtom = atom<boolean>((get) => {
-	const userInfo = get(userInfoAtom);
-	return isNil(userInfo) ? false : userInfo.unconfirmed.split(",").includes("number");
-});
 
 export const walletAtom = atom<MetaIDWalletForBtc | null>(null);
 // export const userInfoAtom = atom<UserInfo | null>(null);

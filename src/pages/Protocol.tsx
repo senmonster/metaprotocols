@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import BackButton from "../components/Buttons/BackButton";
-import { getPinDetailByPid } from "../api/pin";
 import { ProtocolItem } from "../types";
 import JsonFormatter from "react-json-formatter";
 
 import "./styles.css";
 import { useAtomValue } from "jotai";
 import { networkAtom } from "../store/user";
+import { getPinDetailByPid } from "../api/protocol";
 const Protocol = () => {
 	const network = useAtomValue(networkAtom);
 

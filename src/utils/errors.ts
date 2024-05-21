@@ -6,5 +6,5 @@ export const errors = {
 
 	SWITCH_TESTNET_ALERT: "Please switch to the Testnet to go on..",
 	STILL_MEMPOOL_ALERT:
-		"MetaID Init TX hasn't been confirmed yet. You can click the gray refresh button on the right to check the latest transaction confirmation status",
+		"Your MetaID initialization is yet to be confirmed. Click refresh button to check if it's ready and then go on.",
 };

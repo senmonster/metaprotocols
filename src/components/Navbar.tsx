@@ -1,14 +1,13 @@
 import { useAtom, useAtomValue } from "jotai";
 import { Link } from "react-router-dom";
 
-import { connectedAtom, globalFeeRateAtom, initStillPoolAtom, userInfoAtom } from "../store/user";
+import { connectedAtom, globalFeeRateAtom, userInfoAtom } from "../store/user";
 
 import { checkMetaletConnected, checkMetaletInstalled } from "../utils/wallet";
 import ProtocolFormWrap from "./ProtocolFormWrap";
 import CustomAvatar from "./CustomAvatar";
 import { SquarePlus } from "lucide-react";
-import { errors } from "../utils/errors";
-import { toast } from "react-toastify";
+
 // import { BtcNetwork } from "../api/request";
 // import { toast } from "react-toastify";
 
@@ -23,25 +22,17 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 
 	const connected = useAtomValue(connectedAtom);
 	const userInfo = useAtomValue(userInfoAtom);
-	const stillPool = useAtomValue(initStillPoolAtom);
 	// const [network, setNetwork] = useAtom(networkAtom);
 
 	const onProtocolStart = async () => {
 		await checkMetaletInstalled();
 		await checkMetaletConnected(connected);
-		if (stillPool) {
-			toast.error(errors.STILL_MEMPOOL_ALERT);
-			return;
-		}
+
 		const doc_modal = document.getElementById("new_protocol_modal") as HTMLDialogElement;
 		doc_modal.showModal();
 	};
 
 	const onEditProfileStart = async () => {
-		if (stillPool) {
-			toast.error(errors.STILL_MEMPOOL_ALERT);
-			return;
-		}
 		const doc_modal = document.getElementById("edit_metaid_modal") as HTMLDialogElement;
 		doc_modal.showModal();
 	};

@@ -134,9 +134,10 @@ const CreateMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
 					{!isNil(avatar) && avatar.length !== 0 ? (
 						<div className="bg-inheirt border border-dashed border-main rounded-full w-[100px] h-[100px] grid place-items-center mx-auto">
 							<img
-								className="image self-center rounded-full"
-								height={"100px"}
-								width={"100px"}
+								className="image self-center rounded-full h-[100px] w-[100px]"
+								style={{
+									objectFit: "cover",
+								}}
 								src={filesPreview[0]}
 								alt=""
 							/>

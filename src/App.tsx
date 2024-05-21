@@ -65,36 +65,13 @@ function App() {
 				}
 			);
 		});
-		// window.metaidwallet.on("networkChanged", (network: string) => {
-		// 	console.log("network", network);
-		// 	if (network !== "testnet") {
-		// 		onLogout();
-		// 		toast.error(
-		// 			"Wallet Network Changed ---- You have been automatically logged out of your current BitProtocol account. Please Switch to Testnet login again...",
-		// 			{
-		// 				className:
-		// 					"!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
-		// 			}
-		// 		);
-		// 	}
-		// });
-		// window.addEventListener("beforeunload", (e) => {
-		// 	const confirmMessage = "oos";
-		// 	e.returnValue = confirmMessage;
-		// 	return confirmMessage;
-		// });
-		//////////////////////////
+
 		const _btcConnector: BtcConnector = await btcConnect({
 			network,
 			wallet: _wallet,
 		});
 		setBtcConnector(_btcConnector as BtcConnector);
 
-		// const doc_modal = document.getElementById(
-		//   'create_metaid_modal'
-		// ) as HTMLDialogElement;
-		// doc_modal.showModal();
-		// console.log("getUser", await _btcConnector.getUser());
 		if (!_btcConnector.hasMetaid()) {
 			const doc_modal = document.getElementById("create_metaid_modal") as HTMLDialogElement;
 			doc_modal.showModal();

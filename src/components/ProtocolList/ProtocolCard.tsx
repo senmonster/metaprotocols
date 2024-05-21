@@ -7,13 +7,7 @@ import cls from "classnames";
 import { Pin } from ".";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // import { getPinDetailByPid } from '../../api/pin';
-import {
-	btcConnectorAtom,
-	connectedAtom,
-	globalFeeRateAtom,
-	initStillPoolAtom,
-	networkAtom,
-} from "../../store/user";
+import { btcConnectorAtom, connectedAtom, globalFeeRateAtom, networkAtom } from "../../store/user";
 import { useAtomValue } from "jotai";
 import CustomAvatar from "../CustomAvatar";
 // import { sleep } from '../../utils/time';
@@ -23,7 +17,6 @@ import { checkMetaletConnected, checkMetaletInstalled } from "../../utils/wallet
 // import { temp_protocol } from '../../utils/mockData';
 import "./styles.css";
 import { useNavigate } from "react-router-dom";
-import { errors } from "../../utils/errors";
 type IProps = {
 	protocolItem: Pin | undefined;
 };
@@ -33,7 +26,6 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 	const network = useAtomValue(networkAtom);
 
 	const btcConnector = useAtomValue(btcConnectorAtom);
-	const stillPool = useAtomValue(initStillPoolAtom);
 
 	const queryClient = useQueryClient();
 
@@ -81,10 +73,7 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
 	const handleLike = async (pinId: string) => {
 		await checkMetaletInstalled();
 		await checkMetaletConnected(connected);
-		if (stillPool) {
-			toast.error(errors.STILL_MEMPOOL_ALERT);
-			return;
-		}
+
 		if (isLikeByCurrentUser) {
 			toast.error("You have already liked that protocol...", {
 				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
