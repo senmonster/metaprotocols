@@ -92,7 +92,7 @@ const ProtocolFormWrap = () => {
           (rid) => 'metafile://' + rid + 'i0'
         );
       }
-      await sleep(5000);
+      // await sleep(5000);
 
       console.log('finalBody', finalBody);
       console.log(

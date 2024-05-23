@@ -122,6 +122,8 @@ const ProtocolList = () => {
     setUserInfo(_user);
   };
 
+  console.log('protocols', protocoles);
+
   return (
     <>
       <div className='flex gap-2 items-center place-content-center mt-0 relative pt-4'>
@@ -157,7 +159,7 @@ const ProtocolList = () => {
         </div>
       ) : (
         <>
-          {isEmpty([]) ? (
+          {isEmpty(protocoles ?? []) ? (
             <div className='mt-[30%] ml-[40%] text-[24px] text-white/50'>
               Empty Data.
             </div>
