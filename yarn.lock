@@ -1319,10 +1319,10 @@
   dependencies:
     inquirer "^9.2.11"
 
-"@metaid/metaid@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@metaid/metaid/-/metaid-1.0.2.tgz#bdb18440783dba43e462e5b323e9ef9ae140bc8c"
-  integrity sha512-J4S9koCKJ9gzbZzLHMuPR1/fF/RaT5s0r5YpDcY6oPJ2581SagquR+1yvdEnqxODCylSzG60QJrKiEheu/p6Ag==
+"@metaid/metaid@^1.2.7":
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@metaid/metaid/-/metaid-1.2.7.tgz#59c7199c8e24041e8a130089a411c6faa821dae4"
+  integrity sha512-5nKJIJvN5+111RUIGRT5yFxo3jlP8GXOBpr0PfxZfzBjmDJATo8bkewJuegvExgsp+Rm1WQC6eG0ih01c/P5mg==
   dependencies:
     "@bitcoin-js/tiny-secp256k1-asmjs" "^2.2.3"
     "@metaid/metaid-cli" "0.0.2"
@@ -1760,7 +1760,7 @@
 
 "@types/ramda@^0.29.12":
   version "0.29.12"
-  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.29.12.tgz#fd8a23849176c6c1b3510243b64084c067e6a48f"
+  resolved "https://registry.npmjs.org/@types/ramda/-/ramda-0.29.12.tgz#fd8a23849176c6c1b3510243b64084c067e6a48f"
   integrity sha512-sgIEjpJhdQPB52gDF4aphs9nl0xe54CR22DPdWqT8gQHjZYmVApgA0R3/CpMbl0Y8az2TEZrPNL2zy0EvjbkLA==
   dependencies:
     types-ramda "^0.29.10"
@@ -5793,7 +5793,7 @@ typeforce@^1.11.3, typeforce@^1.11.5:
 
 types-ramda@^0.29.10:
   version "0.29.10"
-  resolved "https://registry.yarnpkg.com/types-ramda/-/types-ramda-0.29.10.tgz#820432905b820301c74f6396f07aa2359b41cde4"
+  resolved "https://registry.npmjs.org/types-ramda/-/types-ramda-0.29.10.tgz#820432905b820301c74f6396f07aa2359b41cde4"
   integrity sha512-5PJiW/eiTPyXXBYGZOYGezMl6qj7keBiZheRwfjJZY26QPHsNrjfJnz0mru6oeqqoTHOni893Jfd6zyUXfQRWg==
   dependencies:
     ts-toolbelt "^9.6.0"

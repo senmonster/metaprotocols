@@ -1,16 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import BackButton from "../components/Buttons/BackButton";
-import { getPinDetailByPid } from "../api/pin";
 import { ProtocolItem } from "../types";
 import JsonFormatter from "react-json-formatter";
 
 import "./styles.css";
+import { useAtomValue } from "jotai";
+import { networkAtom } from "../store/user";
+import { getPinDetailByPid } from "../api/protocol";
 const Protocol = () => {
+	const network = useAtomValue(networkAtom);
+
 	const { id: pinId } = useParams();
 	const { data: protocolDetailData } = useQuery({
 		queryKey: ["protocol", pinId],
-		queryFn: () => getPinDetailByPid({ pid: pinId! }),
+		queryFn: () => getPinDetailByPid({ pid: pinId!, network }),
 	});
 
 	const summary = protocolDetailData?.contentSummary;
@@ -43,7 +47,7 @@ const Protocol = () => {
 					</div>
 				</div>
 				<div className="grid grid-cols-3 gap-6 text-gray-500">
-					<div className="flex items-center gap-1">
+					<div className="flex items-center gap-1 col-span-1">
 						<img
 							src={`/detail-version-icon.png`}
 							alt="logo"
@@ -51,7 +55,7 @@ const Protocol = () => {
 						/>
 						<div>version: {parseSummary?.protocolVersion} </div>
 					</div>
-					<div className="flex items-center gap-1 col-span-2">
+					<div className="flex items-center gap-1 col-span-1">
 						<img
 							src={`/detail-name-icon.png`}
 							alt="logo"
@@ -59,7 +63,7 @@ const Protocol = () => {
 						/>
 						<div>name: {parseSummary?.protocolName} </div>
 					</div>
-					<div className="flex items-center gap-1">
+					<div className="flex items-center gap-1 col-span-1">
 						<img
 							src={`/detail-encoding-icon.png`}
 							alt="logo"
@@ -67,14 +71,14 @@ const Protocol = () => {
 						/>
 						<div className="">encoding: {parseSummary?.protocolEncoding} </div>
 					</div>
-					<div className="flex items-center gap-1 col-span-2">
+					{/* <div className="flex items-center gap-1 col-span-2">
 						<img
 							src={`/detail-brfcid-icon.png`}
 							alt="logo"
 							className="w-[32px] h-[32px]"
 						/>
 						<div>brfcId: {parseSummary?.protocolHASHID} </div>
-					</div>
+					</div> */}
 				</div>
 				<div className="border border-b-0 border-gray-500/50 my-8"></div>
 				<div className="text-[24px]">Protocol Content</div>
@@ -87,7 +91,16 @@ const Protocol = () => {
 				</div>
 				<div className="text-[24px]">Protocol Description</div>
 				<div className="bg-neutral-900 p-8 rounded-lg">
-					<div>{parseSummary?.protocolDescription}</div>
+					<div>
+						{(parseSummary?.protocolDescription ?? "")
+							.split("\n")
+							.map((line, index) => (
+								<span key={index}>
+									{line}
+									<br />
+								</span>
+							))}
+					</div>
 				</div>
 			</div>
 		</div>

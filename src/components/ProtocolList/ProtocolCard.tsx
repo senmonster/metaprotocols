@@ -7,13 +7,9 @@ import cls from 'classnames';
 import { Pin } from '.';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 // import { getPinDetailByPid } from '../../api/pin';
-import {
-  btcConnectorAtom,
-  connectedAtom,
-  initStillPoolAtom,
-} from '../../store/user';
-import { useAtomValue } from 'jotai';
-import CustomAvatar from '../CustomAvatar';
+import { btcConnectorAtom, connectedAtom, globalFeeRateAtom, networkAtom } from "../../store/user";
+import { useAtomValue } from "jotai";
+import CustomAvatar from "../CustomAvatar";
 // import { sleep } from '../../utils/time';
 import { toast } from 'react-toastify';
 import { fetchCurrentProtocolLikes } from '../../api/protocol';
@@ -29,10 +25,10 @@ type IProps = {
 };
 
 const ProtocolCard = ({ protocolItem }: IProps) => {
-  const connected = useAtomValue(connectedAtom);
+	const connected = useAtomValue(connectedAtom);
+	const network = useAtomValue(networkAtom);
 
-  const btcConnector = useAtomValue(btcConnectorAtom);
-  const stillPool = useAtomValue(initStillPoolAtom);
+	const btcConnector = useAtomValue(btcConnectorAtom);
 
   const queryClient = useQueryClient();
 
@@ -40,25 +36,27 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
   const isSummaryJson = summary.startsWith('{') && summary.endsWith('}');
   const parseSummary = isSummaryJson ? JSON.parse(summary) : {};
 
-  // const attachPids = isSummaryJson
-  //   ? (parseSummary?.attachments ?? []).map(
-  //       (d: string) => d.split('metafile://')[1]
-  //     )
-  //   : [];
+	const globalFeeRate = useAtomValue(globalFeeRateAtom);
 
-  const { data: currentLikeData } = useQuery({
-    queryKey: ['payLike', protocolItem!.id],
-    queryFn: () => fetchCurrentProtocolLikes(protocolItem!.id),
-  });
-  const isLikeByCurrentUser = (currentLikeData ?? []).find(
-    (d) => d.pinAddress === btcConnector?.address
-  );
+	// const attachPids = isSummaryJson
+	//   ? (parseSummary?.attachments ?? []).map(
+	//       (d: string) => d.split('metafile://')[1]
+	//     )
+	//   : [];
 
-  const currentUserInfoData = useQuery({
-    queryKey: ['userInfo', protocolItem!.address],
-    queryFn: () => btcConnector?.getUser(protocolItem!.address),
-  });
-  // console.log("current user data", currentUserInfoData.data);
+	const { data: currentLikeData } = useQuery({
+		queryKey: ["payLike", protocolItem!.id, network],
+		queryFn: () => fetchCurrentProtocolLikes({ network, pinId: protocolItem!.id }),
+	});
+	const isLikeByCurrentUser = (currentLikeData ?? []).find(
+		(d) => d.pinAddress === btcConnector?.address
+	);
+
+	const currentUserInfoData = useQuery({
+		queryKey: ["userInfo", protocolItem!.address],
+		queryFn: () => btcConnector?.getUser({ currentAddress: protocolItem!.address, network }),
+	});
+	// console.log("current user data", currentUserInfoData.data);
 
   // const attachData = useQueries({
   //   queries: (attachPids ?? []).map((id: string) => {
@@ -75,55 +73,50 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
   //   },
   // });
 
-  const handleLike = async (pinId: string) => {
-    await checkMetaletInstalled();
-    await checkMetaletConnected(connected);
-    if (stillPool) {
-      return;
-    }
-    if (isLikeByCurrentUser) {
-      toast.error('You have already liked that protocol...', {
-        className:
-          '!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg',
-      });
-      return;
-    }
+	const handleLike = async (pinId: string) => {
+		await checkMetaletInstalled();
+		await checkMetaletConnected(connected);
 
-    const likeEntity = await btcConnector!.use('like');
-    try {
-      const likeRes = await likeEntity.create({
-        options: [
-          {
-            body: JSON.stringify({ isLike: '1', likeTo: pinId }),
-          },
-        ],
-        noBroadcast: 'no',
-      });
-      console.log('likeRes', likeRes);
-      if (!isNil(likeRes?.revealTxIds[0])) {
-        queryClient.invalidateQueries({ queryKey: ['metaprotocols'] });
-        queryClient.invalidateQueries({
-          queryKey: ['payLike', protocolItem!.id],
-        });
-        // await sleep(5000);
-        toast.success('like protocol successfully');
-      }
-    } catch (error) {
-      console.log('error', error);
-      const errorMessage = (error as any)?.message ?? error;
-      const toastMessage = errorMessage.includes(
-        'Cannot read properties of undefined'
-      )
-        ? 'User Canceled'
-        : errorMessage;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      toast.error(toastMessage, {
-        className:
-          '!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg',
-      });
-    }
-  };
-  const navigate = useNavigate();
+		if (isLikeByCurrentUser) {
+			toast.error("You have already liked that protocol...", {
+				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+			});
+			return;
+		}
+
+		const likeEntity = await btcConnector!.use("like");
+		try {
+			const likeRes = await likeEntity.create({
+				options: [
+					{
+						body: JSON.stringify({ isLike: "1", likeTo: pinId }),
+					},
+				],
+				noBroadcast: "no",
+				feeRate: Number(globalFeeRate),
+			});
+			console.log("likeRes", likeRes);
+			if (!isNil(likeRes?.revealTxIds[0])) {
+				queryClient.invalidateQueries({ queryKey: ["metaprotocols"] });
+				queryClient.invalidateQueries({
+					queryKey: ["payLike", protocolItem!.id],
+				});
+				// await sleep(5000);
+				toast.success("like protocol successfully");
+			}
+		} catch (error) {
+			console.log("error", error);
+			const errorMessage = (error as any)?.message;
+			const toastMessage = errorMessage.includes("Cannot read properties of undefined")
+				? "User Canceled"
+				: errorMessage;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			toast.error(toastMessage, {
+				className: "!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg",
+			});
+		}
+	};
+	const navigate = useNavigate();
 
   if (isNil(protocolItem)) {
     return <div>can't fetch this protocol</div>;

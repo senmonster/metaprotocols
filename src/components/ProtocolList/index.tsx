@@ -7,9 +7,8 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { protocolEntityAtom } from "../../store/protocol";
 import { isNil } from "ramda";
 import { BtcEntity } from "@metaid/metaid/dist/core/entity/btc";
-import { btcConnect } from "@metaid/metaid";
-import { BtcConnector } from "@metaid/metaid/dist/core/connector/btc";
-import { userInfoAtom, walletAtom } from "../../store/user";
+// import { btcConnect } from "@metaid/metaid";
+import { btcConnectorAtom, networkAtom, userInfoAtom } from "../../store/user";
 // import './styles.css';
 export type Pin = {
 	id: string;
@@ -38,12 +37,14 @@ export type Pin = {
 const ProtocolList = () => {
 	const { ref, inView } = useInView();
 	const [total, setTotal] = useState<null | number>(null);
+	const network = useAtomValue(networkAtom);
 	const setUserInfo = useSetAtom(userInfoAtom);
-	const _wallet = useAtomValue(walletAtom);
+	// const _wallet = useAtomValue(walletAtom);
+	const btcConnector = useAtomValue(btcConnectorAtom);
 
 	const protocolEntity = useAtomValue(protocolEntityAtom);
 	const getTotal = async (buzzEntity: BtcEntity) => {
-		setTotal(await buzzEntity?.calcPins());
+		setTotal(await buzzEntity?.total({ network }));
 	};
 
 	const {
@@ -63,6 +64,7 @@ const ProtocolList = () => {
 				page: pageParam,
 				limit: 5,
 				protocolEntity: protocolEntity!,
+				network,
 			}),
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, allPages) => {
@@ -111,8 +113,11 @@ const ProtocolList = () => {
 	const handleRefresh = async () => {
 		refetch();
 		// const _wallet = await MetaletWalletForBtc.create();
-		const _btcConnector: BtcConnector = await btcConnect(_wallet ?? undefined);
-		const _user = await _btcConnector.getUser();
+		// const _btcConnector: BtcConnector = await btcConnect({
+		// 	network,
+		// 	wallet: _wallet ?? undefined,
+		// });
+		const _user = await btcConnector!.getUser({ network });
 
 		setUserInfo(_user);
 	};

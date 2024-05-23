@@ -6,40 +6,39 @@ import ProtocolForm, { AttachmentItem, ProtocolFormData } from './ProtocolForm';
 import { toast } from 'react-toastify';
 import LoadingOverlay from 'react-loading-overlay-ts';
 // import dayjs from 'dayjs';
-import { protocolEntityAtom } from '../../store/protocol';
-import { useAtomValue } from 'jotai';
-import { isEmpty, isNil } from 'ramda';
-import { useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { btcConnectorAtom } from '../../store/user';
-import { sleep } from '../../utils/time';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { image2Attach } from '../../utils/file';
-import { ProtocolItem } from '../../types';
-import { createBrfcid } from '../../utils/crypto';
-import { temp_protocol } from '../../utils/mockData';
-import { fetchFeeRate } from '../../api/fee';
-import { CreateOptions } from '@metaid/metaid';
+import { protocolEntityAtom } from "../../store/protocol";
+import { useAtomValue } from "jotai";
+import { isEmpty, isNil } from "ramda";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { btcConnectorAtom, globalFeeRateAtom } from "../../store/user";
+import { sleep } from "../../utils/time";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { image2Attach } from "../../utils/file";
+import { ProtocolItem } from "../../types";
+import { createBrfcid } from "../../utils/crypto";
+// import { temp_protocol } from "../../utils/mockData";
+import { fetchFeeRate } from "../../api/fee";
+import { CreateOptions } from "@metaid/metaid";
 const ProtocolFormWrap = () => {
-  const protocolEntity = useAtomValue(protocolEntityAtom);
-  const btcConnector = useAtomValue(btcConnectorAtom);
+	const globalFeerate = useAtomValue(globalFeeRateAtom);
+	const protocolEntity = useAtomValue(protocolEntityAtom);
+	const btcConnector = useAtomValue(btcConnectorAtom);
 
   const [isAdding, setIsAdding] = useState(false);
   const queryClient = useQueryClient();
 
   const protocolFormHandle = useForm<ProtocolFormData>();
 
-  const onCreateSubmit: SubmitHandler<ProtocolFormData> = async (data) => {
-    console.log('submit form protocol data', data);
-    if (isEmpty(data.tags)) {
-      protocolFormHandle.setError('tags', { type: 'Required' });
-      return;
-    }
-    const protocolAttachments =
-      data?.protocolAttachments?.length !== 0 &&
-      !isNil(data?.protocolAttachments)
-        ? await image2Attach(data.protocolAttachments)
-        : [];
+	const onCreateSubmit: SubmitHandler<ProtocolFormData> = async (data) => {
+		if (isEmpty(data.tags)) {
+			protocolFormHandle.setError("tags", { type: "Required" });
+			return;
+		}
+		const protocolAttachments =
+			data?.protocolAttachments?.length !== 0 && !isNil(data?.protocolAttachments)
+				? await image2Attach(data.protocolAttachments)
+				: [];
 
     await handleAddProtocol({
       ...data,
@@ -54,23 +53,21 @@ const ProtocolFormWrap = () => {
   ) => {
     setIsAdding(true);
 
-    console.log('protocol data', temp_protocol);
-    const protocolHASHID = createBrfcid({
-      title: protocol.protocolTitle,
-      author: protocol.protocolAuthor,
-      version: protocol.protocolVersion,
-    });
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const finalBody: ProtocolItem = {
-        ...temp_protocol,
-        protocolHASHID,
-        protocolAttachments: [],
-        tags: ['meta', 'protocols'],
-        relatedProtocols: [],
-      };
-      if (!isEmpty(protocol.protocolAttachments)) {
-        const fileOptions: CreateOptions[] = [];
+		const protocolHASHID = createBrfcid({
+			title: protocol.protocolTitle,
+			author: protocol.protocolAuthor,
+			version: protocol.protocolVersion,
+		});
+		try {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const finalBody: ProtocolItem = {
+				...protocol,
+				protocolHASHID,
+				protocolAttachments: [],
+			};
+
+			if (!isEmpty(protocol.protocolAttachments)) {
+				const fileOptions: CreateOptions[] = [];
 
         const fileEntity = await btcConnector!.use('file');
 
@@ -95,7 +92,8 @@ const ProtocolFormWrap = () => {
       }
       await sleep(5000);
 
-      console.log('finalBody', finalBody);
+			console.log("finalBody", finalBody);
+			console.log("protocolEntity", protocolEntity, "wallet", btcConnector?.address);
 
       const createRes = await protocolEntity!.create({
         options: [{ body: JSON.stringify(finalBody) }],
@@ -137,23 +135,20 @@ const ProtocolFormWrap = () => {
     queryFn: () => fetchFeeRate({ netWork: 'testnet' }),
   });
 
-  const [customFee, setCustomFee] = useState<string>('1');
+	const [customFee, setCustomFee] = useState<string>(globalFeerate);
 
-  const feeRateOptions = useMemo(() => {
-    return [
-      { name: 'Slow', number: feeRateData?.hourFee ?? 1 },
-      { name: 'Avg', number: feeRateData?.halfHourFee ?? 1 },
-      { name: 'Fast', number: feeRateData?.fastestFee ?? 1 },
-      { name: 'Custom', number: Number(customFee) },
-    ];
-  }, [feeRateData, customFee]);
-  const [selectFeeRate, setSelectFeeRate] = useState<{
-    name: string;
-    number: number;
-  }>({
-    name: 'Slow',
-    number: feeRateData?.hourFee ?? 1,
-  });
+	const feeRateOptions = useMemo(() => {
+		return [
+			{ name: "Slow", number: feeRateData?.hourFee ?? Number(globalFeerate) },
+			{ name: "Avg", number: feeRateData?.halfHourFee ?? Number(globalFeerate) },
+			{ name: "Fast", number: feeRateData?.fastestFee ?? Number(globalFeerate) },
+			{ name: "Custom", number: Number(customFee) },
+		];
+	}, [feeRateData, customFee, globalFeerate]);
+	const [selectFeeRate, setSelectFeeRate] = useState<{ name: string; number: number }>({
+		name: "Custom",
+		number: Number(customFee),
+	});
 
   return (
     <LoadingOverlay active={isAdding} spinner text='Submiting New Protocol...'>
