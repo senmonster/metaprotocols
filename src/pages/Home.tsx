@@ -1,13 +1,13 @@
-import ProtocolList from "../components/ProtocolList";
+import ProtocolList from '../components/ProtocolList';
 
 const Home = () => {
-	return (
-		<main className="relative">
-			{/* <RecommendUsers /> */}
+  return (
+    <main className='relative h-full'>
+      {/* <RecommendUsers /> */}
 
-			<ProtocolList />
-		</main>
-	);
+      <ProtocolList />
+    </main>
+  );
 };
 
 export default Home;

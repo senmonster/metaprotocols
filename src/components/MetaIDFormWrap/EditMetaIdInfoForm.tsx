@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import cls from 'classnames';
 import { Image } from 'lucide-react';
 import useImagesPreview from '../../hooks/useImagesPreview';
 import { isEmpty, isNil } from 'ramda';
 import { image2Attach } from '../../utils/file';
 import { MetaidUserInfo } from './CreateMetaIDFormWrap';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import CustomFeerate from '../CustomFeerate';
-import { useQuery } from '@tanstack/react-query';
-import { fetchFeeRate } from '../../api/fee';
-import { globalFeeRateAtom } from '../../store/user';
+
+import { MAN_BASE_URL_MAPPING } from '../../api/request';
 import { useAtomValue } from 'jotai';
+import { globalFeeRateAtom, networkAtom } from '../../store/user';
 
 export type FormUserInfo = {
   name: string;
@@ -25,13 +25,16 @@ type IProps = {
 };
 
 const EditMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
+  const network = useAtomValue(networkAtom);
   const globalFeerate = useAtomValue(globalFeeRateAtom);
   const {
     register,
     handleSubmit,
     formState: { errors },
+
     setValue,
     watch,
+    control,
   } = useForm<FormUserInfo>({
     defaultValues: {
       name: initialValues?.name ?? '',
@@ -47,55 +50,24 @@ const EditMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
   }, [initialValues]);
 
   const avatar = watch('avatar');
-
   const [filesPreview, setFilesPreview] = useImagesPreview(avatar);
   const onCreateSubmit: SubmitHandler<FormUserInfo> = async (data) => {
     const submitAvatar =
       !isNil(data?.avatar) && data.avatar.length !== 0
         ? await image2Attach(data.avatar)
         : [];
-
     const submitData = {
       ...data,
       avatar: !isEmpty(submitAvatar)
         ? Buffer.from(submitAvatar[0].data, 'hex').toString('base64')
         : undefined,
       bio: isEmpty(data?.bio ?? '') ? undefined : data?.bio,
-      feeRate: selectFeeRate?.number ?? 1,
+      feeRate: Number(globalFeerate),
     };
     console.log('submit profile data', submitData);
     onSubmit(submitData);
   };
   // console.log('avatar', avatar, !isNil(avatar) && avatar.length !== 0);
-
-  const { data: feeRateData } = useQuery({
-    queryKey: ['feeRate'],
-    queryFn: () => fetchFeeRate({ netWork: 'testnet' }),
-  });
-
-  const [customFee, setCustomFee] = useState<string>(globalFeerate);
-
-  const feeRateOptions = useMemo(() => {
-    return [
-      { name: 'Slow', number: feeRateData?.hourFee ?? Number(globalFeerate) },
-      {
-        name: 'Avg',
-        number: feeRateData?.halfHourFee ?? Number(globalFeerate),
-      },
-      {
-        name: 'Fast',
-        number: feeRateData?.fastestFee ?? Number(globalFeerate),
-      },
-      { name: 'Custom', number: Number(customFee) },
-    ];
-  }, [feeRateData, customFee, globalFeerate]);
-  const [selectFeeRate, setSelectFeeRate] = useState<{
-    name: string;
-    number: number;
-  }>({
-    name: 'Slow',
-    number: feeRateData?.hourFee ?? 1,
-  });
 
   return (
     <form
@@ -105,7 +77,7 @@ const EditMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
     >
       <div className='flex flex-col gap-8'>
         <div className='flex flex-col gap-2'>
-          <div className='text-white'>Your Name</div>
+          <div className='text-white'>Name</div>
           <label
             className={cls(
               'input input-bordered border-white text-white bg-[black] flex items-center gap-2 relative',
@@ -130,26 +102,27 @@ const EditMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
           </label>
         </div>
 
-        {!isNil(initialValues?.avatar) && (
+        {!isNil(initialValues?.avatar) && !isEmpty(initialValues?.avatar) && (
           <div className='flex flex-col gap-2'>
             <div className='flex justify-between'>
-              <div className='text-white'>Current PFP</div>
+              <div className='text-white'>Current Avatar</div>
             </div>
 
             <img
-              className='image self-center rounded-full h-[100px] w-[100px]'
+              className='image self-center rounded-full h-[100px] w-[100px] '
               style={{
                 objectFit: 'cover',
               }}
-              src={`https://man-test.metaid.io${initialValues?.avatar}`}
+              src={`${MAN_BASE_URL_MAPPING[network]}${initialValues?.avatar}`}
               alt=''
             />
           </div>
         )}
 
         <div className='flex flex-col gap-2'>
-          <div className='flex justify-between'>
-            <div className='text-white'>New PFP</div>
+          <div className='flex justify-between items-center'>
+            <div className='text-white'>New Avatar</div>
+
             {!isNil(avatar) && avatar.length !== 0 && (
               <div
                 className='btn btn-xs btn-outline font-normal text-white'
@@ -163,18 +136,38 @@ const EditMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
             )}
           </div>
 
-          <input
-            type='file'
-            accept='.jpg,.jpeg,.png,.webp'
-            id='addPFP2'
-            className='hidden'
-            {...register('avatar')}
+          <Controller
+            control={control}
+            name='avatar'
+            render={({ field: { onChange } }) => (
+              <input
+                type='file'
+                accept='.gif,.jpg,.jpeg,.png,.webp'
+                id='addPFP2'
+                className='hidden'
+                {...register('avatar')}
+                onChange={(e) => {
+                  const maxFileSize = 200 * 1024; // max file size 200kb
+                  const files = e.target.files;
+                  if (!isNil(files) && files[0].size > maxFileSize) {
+                    alert('File size cannot be greater than 200kb');
+
+                    setValue('avatar', [] as any); // clear file input value
+                    e.target.value = ''; // clear file input value
+                    return;
+                  }
+                  onChange(files);
+                }}
+              />
+            )}
           />
 
+          {/* <input type="file" id="addPFP2" className="hidden" {...register("avatar")} /> */}
+
           {!isNil(avatar) && avatar.length !== 0 ? (
-            <div className='bg-inheirt border border-dashed border-main rounded-full w-[100px] h-[100px] grid place-items-center mx-auto'>
+            <div className='relative w-[105px] h-[105px] bg-inheirt border border-dashed border-main rounded-full grid place-items-center mx-auto'>
               <img
-                className='image self-center rounded-full h-[100px] w-[100px]'
+                className='absolute top-[1px] left-0.5 image self-center rounded-full h-[100px] w-[100px]'
                 style={{
                   objectFit: 'cover',
                 }}
@@ -190,18 +183,13 @@ const EditMetaIdInfoForm = ({ onSubmit, initialValues }: IProps) => {
               className='btn btn-outline font-normal text-white bg-[black]'
             >
               <Image size={16} />
-              Click To Update
+              Upload
             </div>
           )}
         </div>
 
-        <CustomFeerate
-          customFee={customFee}
-          setSelectFeeRate={setSelectFeeRate}
-          selectFeeRate={selectFeeRate}
-          handleCustomFeeChange={setCustomFee}
-          feeRateOptions={feeRateOptions}
-        />
+        <CustomFeerate />
+
         {/* <div className="flex flex-col gap-2">
 					<div className="text-white">Your Bio</div>
 

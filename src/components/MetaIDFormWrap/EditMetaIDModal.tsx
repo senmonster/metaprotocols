@@ -16,7 +16,7 @@ const EditMetaIDModal = ({ btcConnector }: Iprops) => {
           </button>
         </form>
         <h3 className='font-medium text-white text-[16px] text-center'>
-          Update Your Profile
+          MetaID Profile
         </h3>
         <EditMetaIDFormWrap btcConnector={btcConnector!} />
       </div>

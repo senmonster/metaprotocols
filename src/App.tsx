@@ -19,12 +19,13 @@ import {
 } from './store/user';
 import { protocolEntityAtom } from './store/protocol';
 import { errors } from './utils/errors';
-import { isNil } from 'ramda';
+import { isEmpty, isNil } from 'ramda';
 import { checkMetaletInstalled, confirmMetaletMainnet } from './utils/wallet';
 import CreateMetaIDModal from './components/MetaIDFormWrap/CreateMetaIDModal';
 import EditMetaIDModal from './components/MetaIDFormWrap/EditMetaIDModal';
 import { useEffect } from 'react';
 import { BtcNetwork } from './api/request';
+import InsertMetaletAlertModal from './components/InsertMetaletAlertModal';
 
 function App() {
   const setConnected = useSetAtom(connectedAtom);
@@ -75,20 +76,16 @@ function App() {
     });
     setBtcConnector(_btcConnector as BtcConnector);
 
-    if (!_btcConnector.hasMetaid()) {
+    const resUser = await _btcConnector.getUser({ network });
+
+    if (isNil(resUser?.name) || isEmpty(resUser?.name)) {
       const doc_modal = document.getElementById(
         'create_metaid_modal'
       ) as HTMLDialogElement;
       doc_modal.showModal();
     } else {
-      const resUser = await _btcConnector.getUser({ network });
-      // console.log("user now", resUser);
       setUserInfo(resUser);
       setConnected(true);
-      console.log(
-        await _btcConnector.use('metaprotocols'),
-        'metaprotocols entity'
-      );
       setProtocolEntity(await _btcConnector.use('metaprotocols'));
       console.log('your btc address: ', _btcConnector.address);
     }
@@ -168,6 +165,7 @@ function App() {
         onWalletConnectStart={onWalletConnectStart}
       />
       <EditMetaIDModal btcConnector={btcConnector!} />
+      <InsertMetaletAlertModal />
     </div>
   );
 }

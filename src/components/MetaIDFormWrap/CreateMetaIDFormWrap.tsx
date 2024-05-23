@@ -37,7 +37,11 @@ const CreateMetaIDFormWrap = ({
     setIsCreating(true);
 
     const res = await btcConnector
-      .createUserInfo({ ...userInfo, feeRate: Number(globalFeeRate) })
+      .createUserInfo({
+        ...userInfo,
+        network: 'mainnet',
+        feeRate: Number(globalFeeRate),
+      })
       .catch((error: any) => {
         setIsCreating(false);
         console.log(

@@ -6,6 +6,4 @@ export const errors = {
 
   SWITCH_TESTNET_ALERT: 'Please switch to the Testnet to go on..',
   SWITCH_MAINNET_ALERT: 'Please switch to the Mainnet to go on..',
-  STILL_MEMPOOL_ALERT:
-    "Your MetaID initialization is yet to be confirmed. Click refresh button to check if it's ready and then go on.",
 };
