@@ -16,6 +16,7 @@ import {
   networkAtom,
   userInfoAtom,
   walletAtom,
+  walletRestoreParamsAtom,
 } from './store/user';
 import { protocolEntityAtom } from './store/protocol';
 import { errors } from './utils/errors';
@@ -23,23 +24,27 @@ import { isEmpty, isNil } from 'ramda';
 import { checkMetaletInstalled, confirmMetaletMainnet } from './utils/wallet';
 import CreateMetaIDModal from './components/MetaIDFormWrap/CreateMetaIDModal';
 import EditMetaIDModal from './components/MetaIDFormWrap/EditMetaIDModal';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { BtcNetwork } from './api/request';
 import InsertMetaletAlertModal from './components/InsertMetaletAlertModal';
 
 function App() {
-  const setConnected = useSetAtom(connectedAtom);
+  const [connected, setConnected] = useAtom(connectedAtom);
   const setWallet = useSetAtom(walletAtom);
   const [btcConnector, setBtcConnector] = useAtom(btcConnectorAtom);
-  const setProtocolEntity = useSetAtom(protocolEntityAtom);
   const setUserInfo = useSetAtom(userInfoAtom);
   const network = useAtomValue(networkAtom);
+  const [walletParams, setWalletParams] = useAtom(walletRestoreParamsAtom);
+
+  const setProtocolEntity = useSetAtom(protocolEntityAtom);
 
   const onLogout = () => {
     setConnected(false);
     setBtcConnector(null);
     setProtocolEntity(null);
     setUserInfo(null);
+    setWalletParams(undefined);
+
     window.metaidwallet.removeListener('accountsChanged');
     window.metaidwallet.removeListener('networkChanged');
   };
@@ -50,6 +55,10 @@ function App() {
     await confirmMetaletMainnet();
 
     setWallet(_wallet);
+    setWalletParams({
+      address: _wallet.address,
+      pub: _wallet.pub,
+    });
     if (isNil(_wallet?.address)) {
       toast.error(errors.NO_METALET_LOGIN, {
         className:
@@ -59,16 +68,6 @@ function App() {
     }
 
     // add event listenr
-    window.metaidwallet.on('accountsChanged', () => {
-      onLogout();
-      toast.error(
-        'Wallet Account Changed ---- You have been automatically logged out of your current BitProtocol account. Please login again...',
-        {
-          className:
-            '!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg',
-        }
-      );
-    });
 
     const _btcConnector: BtcConnector = await btcConnect({
       network,
@@ -101,19 +100,68 @@ function App() {
     getProtocolEntity();
   }, []);
 
-  useEffect(() => {
-    if (!isNil(window?.metaidwallet)) {
-      window.metaidwallet.on('networkChanged', async (network: BtcNetwork) => {
-        toast.error('Wallet Network Changed!', {
-          className:
-            '!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg',
-        });
-        if (network !== 'mainnet') {
-          await window.metaidwallet.switchNetwork({ network: 'mainnet' });
-        }
+  const handleBeforeUnload = async () => {
+    if (!isNil(walletParams)) {
+      const _wallet = MetaletWalletForBtc.restore({
+        ...walletParams,
+        internal: window.metaidwallet,
       });
+      setWallet(_wallet);
+      const _btcConnector = await btcConnect({
+        wallet: _wallet,
+        network: network,
+      });
+      setBtcConnector(_btcConnector);
+      setUserInfo(_btcConnector.user);
+      // setConnected(true);
+      console.log('refetch user', _btcConnector.user);
     }
-  }, [window?.metaidwallet]);
+  };
+
+  const wrapHandleBeforeUnload = useCallback(handleBeforeUnload, [
+    walletParams,
+    setUserInfo,
+  ]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      wrapHandleBeforeUnload();
+    }, 1000);
+  }, [wrapHandleBeforeUnload]);
+
+  const handleAcccountsChanged = () => {
+    onLogout();
+    toast.error('Wallet Account Changed ----Please login again...');
+  };
+
+  const handleNetworkChanged = async (network: BtcNetwork) => {
+    if (connected) {
+      onLogout();
+    }
+    toast.error('Wallet Network Changed  ');
+    if (network !== 'mainnet') {
+      toast.error(errors.SWITCH_MAINNET_ALERT, {
+        className:
+          '!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg',
+      });
+      await window.metaidwallet.switchNetwork({ network: 'mainnet' });
+
+      throw new Error(errors.SWITCH_MAINNET_ALERT);
+    }
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!isNil(window?.metaidwallet)) {
+        if (connected) {
+          window.metaidwallet.on('accountsChanged', handleAcccountsChanged);
+        }
+
+        window.metaidwallet.on('networkChanged', handleNetworkChanged);
+      }
+    }, 1000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected, window?.metaidwallet]);
 
   // const handleTest = async () => {
   //   console.log('connected', connected);
