@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { type BtcEntity } from '@metaid/metaid/dist/core/entity/btc';
 import { Pin } from '../components/ProtocolList';
-import { BtcNetwork, MAN_BASE_URL_MAPPING } from './request';
+import { BtcNetwork } from './request';
+import { environment } from '../utils/environments';
+import { IBtcEntity } from '@metaid/metaid';
 // export async function fetchProtocols(page: number): Promise<ProtocolItem[]> {
 // 	const response = await axios.get(
 // 		`http://localhost:3000/protocoles?_page=${page}&_limit=5&_sort=createTime&_order=desc`
@@ -24,7 +25,7 @@ export async function fetchProtocols({
   limit,
   network,
 }: {
-  protocolEntity: BtcEntity;
+  protocolEntity: IBtcEntity;
   page: number;
   limit: number;
   network: BtcNetwork;
@@ -36,7 +37,6 @@ export async function fetchProtocols({
 
 export async function fetchCurrentProtocolLikes({
   pinId,
-  network,
 }: {
   pinId: string;
   network: BtcNetwork;
@@ -69,7 +69,7 @@ export async function fetchCurrentProtocolLikes({
 
   try {
     const data = await axios
-      .post(`${MAN_BASE_URL_MAPPING[network]}/api/generalQuery`, body)
+      .post(`${environment.base_man_url}/api/generalQuery`, body)
       .then((res) => res.data);
     return data.data;
   } catch (error) {
@@ -80,12 +80,11 @@ export async function fetchCurrentProtocolLikes({
 
 export async function getPinDetailByPid({
   pid,
-  network,
 }: {
   pid: string;
   network: BtcNetwork;
 }): Promise<Pin | null> {
-  const url = `${MAN_BASE_URL_MAPPING[network]}/api/pin/${pid}`;
+  const url = `${environment.base_man_url}/api/pin/${pid}`;
 
   try {
     const data = await axios.get(url).then((res) => res.data);

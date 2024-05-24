@@ -21,7 +21,6 @@ const Navbar = ({ onWalletConnectStart, onLogout }: IProps) => {
 
   const connected = useAtomValue(connectedAtom);
   const userInfo = useAtomValue(userInfoAtom);
-  // const [network, setNetwork] = useAtom(networkAtom);
 
   const onProtocolStart = async () => {
     await checkMetaletInstalled();

@@ -1,5 +1,6 @@
 import { toast } from 'react-toastify';
 import { errors } from './errors';
+import { environment } from './environments';
 
 export const checkMetaletInstalled = async () => {
   const metalet = window?.metaidwallet;
@@ -17,31 +18,17 @@ export const checkMetaletInstalled = async () => {
   }
 };
 
-export const conirmMetaletTestnet = async () => {
+export const confirmCurrentNetwork = async () => {
   const metalet = window?.metaidwallet;
   const network = await metalet?.getNetwork();
-  if (network?.network !== 'testnet') {
-    toast.error(errors.SWITCH_TESTNET_ALERT, {
+  if (network?.network !== environment.network) {
+    toast.error(errors.SWITCH_NETWORK_ALERT, {
       className:
         '!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg',
     });
-    await window.metaidwallet.switchNetwork({ network: 'testnet' });
+    await window.metaidwallet.switchNetwork({ network: environment.network });
 
-    throw new Error(errors.SWITCH_TESTNET_ALERT);
-  }
-};
-
-export const confirmMetaletMainnet = async () => {
-  const metalet = window?.metaidwallet;
-  const network = await metalet?.getNetwork();
-  if (network?.network !== 'mainnet') {
-    toast.error(errors.SWITCH_MAINNET_ALERT, {
-      className:
-        '!text-[#DE613F] !bg-[black] border border-[#DE613f] !rounded-lg',
-    });
-    await window.metaidwallet.switchNetwork({ network: 'mainnet' });
-
-    throw new Error(errors.SWITCH_MAINNET_ALERT);
+    throw new Error(errors.SWITCH_NETWORK_ALERT);
   }
 };
 

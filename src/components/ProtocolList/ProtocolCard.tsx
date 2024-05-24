@@ -11,7 +11,6 @@ import {
   btcConnectorAtom,
   connectedAtom,
   globalFeeRateAtom,
-  networkAtom,
 } from '../../store/user';
 import { useAtomValue } from 'jotai';
 import CustomAvatar from '../CustomAvatar';
@@ -25,13 +24,13 @@ import {
 // import { temp_protocol } from '../../utils/mockData';
 import './styles.css';
 import { useNavigate } from 'react-router-dom';
+import { environment } from '../../utils/environments';
 type IProps = {
   protocolItem: Pin | undefined;
 };
 
 const ProtocolCard = ({ protocolItem }: IProps) => {
   const connected = useAtomValue(connectedAtom);
-  const network = useAtomValue(networkAtom);
 
   const btcConnector = useAtomValue(btcConnectorAtom);
 
@@ -50,9 +49,12 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
   //   : [];
 
   const { data: currentLikeData } = useQuery({
-    queryKey: ['payLike', protocolItem!.id, network],
+    queryKey: ['payLike', protocolItem!.id, environment.network],
     queryFn: () =>
-      fetchCurrentProtocolLikes({ network, pinId: protocolItem!.id }),
+      fetchCurrentProtocolLikes({
+        network: environment.network,
+        pinId: protocolItem!.id,
+      }),
   });
   const isLikeByCurrentUser = (currentLikeData ?? []).find(
     (d) => d.pinAddress === btcConnector?.address
@@ -61,7 +63,10 @@ const ProtocolCard = ({ protocolItem }: IProps) => {
   const currentUserInfoData = useQuery({
     queryKey: ['userInfo', protocolItem!.address],
     queryFn: () =>
-      btcConnector?.getUser({ currentAddress: protocolItem!.address, network }),
+      btcConnector?.getUser({
+        currentAddress: protocolItem!.address,
+        network: environment.network,
+      }),
   });
   // console.log("current user data", currentUserInfoData.data);
 

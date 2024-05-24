@@ -6,9 +6,10 @@ import { useInView } from 'react-intersection-observer';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { protocolEntityAtom } from '../../store/protocol';
 import { isEmpty, isNil } from 'ramda';
-import { BtcEntity } from '@metaid/metaid/dist/core/entity/btc';
+import { IBtcEntity } from '@metaid/metaid';
 // import { btcConnect } from "@metaid/metaid";
-import { btcConnectorAtom, networkAtom, userInfoAtom } from '../../store/user';
+import { btcConnectorAtom, userInfoAtom } from '../../store/user';
+import { environment } from '../../utils/environments';
 // import './styles.css';
 export type Pin = {
   id: string;
@@ -37,14 +38,13 @@ export type Pin = {
 const ProtocolList = () => {
   const { ref, inView } = useInView();
   const [total, setTotal] = useState<null | number>(null);
-  const network = useAtomValue(networkAtom);
   const setUserInfo = useSetAtom(userInfoAtom);
   // const _wallet = useAtomValue(walletAtom);
   const btcConnector = useAtomValue(btcConnectorAtom);
 
   const protocolEntity = useAtomValue(protocolEntityAtom);
-  const getTotal = async (buzzEntity: BtcEntity) => {
-    setTotal(await buzzEntity?.total({ network }));
+  const getTotal = async (buzzEntity: IBtcEntity) => {
+    setTotal(await buzzEntity?.total({ network: environment.network }));
   };
 
   const {
@@ -64,7 +64,7 @@ const ProtocolList = () => {
         page: pageParam,
         limit: 5,
         protocolEntity: protocolEntity!,
-        network,
+        network: environment.network,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {

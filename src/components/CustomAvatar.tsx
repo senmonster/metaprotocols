@@ -1,7 +1,6 @@
-import { useAtomValue } from 'jotai';
-import { UserInfo, networkAtom } from '../store/user';
+import { UserInfo } from '../store/user';
 import { isEmpty, isNil } from 'ramda';
-import { MAN_BASE_URL_MAPPING } from '../api/request';
+import { environment } from '../utils/environments';
 
 const CustomAvatar = ({
   userInfo,
@@ -10,15 +9,13 @@ const CustomAvatar = ({
   userInfo: UserInfo;
   size?: number;
 }) => {
-  const network = useAtomValue(networkAtom);
-
   const hasName = !isNil(userInfo?.name) && !isEmpty(userInfo?.name);
   const hasAvatar = !isNil(userInfo?.avatar) && !isEmpty(userInfo?.avatar);
   const userAlt = hasName
     ? userInfo.name.slice(0, 2)
     : (userInfo?.metaid ?? '').slice(-4, -2);
 
-  const src = `${MAN_BASE_URL_MAPPING[network]}${userInfo?.avatar ?? ''}`;
+  const src = `${environment.base_man_url}${userInfo?.avatar ?? ''}`;
   return hasAvatar ? (
     <img
       src={src}

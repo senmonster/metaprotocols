@@ -1,6 +1,6 @@
-import { type BtcEntity } from "@metaid/metaid/dist/core/entity/btc";
-import { atom } from "jotai";
+import { type IBtcEntity } from '@metaid/metaid';
+import { atom } from 'jotai';
 // import { Pin } from '../components/ProtocolList';
 
-export const protocolEntityAtom = atom<BtcEntity | null>(null);
+export const protocolEntityAtom = atom<IBtcEntity | null>(null);
 // export const protocolPinsAtom = atom<Pin[] | []>([]);

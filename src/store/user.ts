@@ -1,7 +1,5 @@
-import { type BtcConnector } from '@metaid/metaid/dist/core/connector/btc';
-import { MetaIDWalletForBtc } from '@metaid/metaid/dist/wallets/metalet/btcWallet';
+import { IMetaletWalletForBtc, type IBtcConnector } from '@metaid/metaid';
 import { atom } from 'jotai';
-import { BtcNetwork } from '../api/request';
 import { atomWithStorage } from 'jotai/utils';
 
 export type UserInfo = {
@@ -17,10 +15,10 @@ export type UserInfo = {
 };
 
 export const connectedAtom = atomWithStorage<boolean>('connectedAtom', false);
-export const btcConnectorAtom = atom<BtcConnector | null>(null);
+export const btcConnectorAtom = atom<IBtcConnector | null>(null);
 export const userInfoAtom = atom<UserInfo | null>(null);
 
-export const walletAtom = atom<MetaIDWalletForBtc | null>(null);
+export const walletAtom = atom<IMetaletWalletForBtc | null>(null);
 // export const userInfoAtom = atom<UserInfo | null>(null);
 /**
  * unisat account stuff
@@ -35,7 +33,6 @@ export const balanceAtom = atom({
   total: 0,
 });
 
-export const networkAtom = atom<BtcNetwork>('mainnet');
 export const globalFeeRateAtom = atom<string>('20');
 
 export const walletRestoreParamsAtom = atomWithStorage<

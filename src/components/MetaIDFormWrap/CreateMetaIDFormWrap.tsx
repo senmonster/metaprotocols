@@ -3,11 +3,11 @@ import LoadingOverlay from 'react-loading-overlay-ts';
 import { useState } from 'react';
 
 import { toast } from 'react-toastify';
-import { BtcConnector } from '@metaid/metaid/dist/core/connector/btc';
 import CreateMetaIdInfoForm from './CreateMetaIdInfoForm';
 import { useAtomValue } from 'jotai';
 import { globalFeeRateAtom, walletAtom } from '../../store/user';
 import { isNil } from 'ramda';
+import { IBtcConnector } from '@metaid/metaid';
 
 export type MetaidUserInfo = {
   name: string;
@@ -20,7 +20,7 @@ const CreateMetaIDFormWrap = ({
   btcConnector,
   onWalletConnectStart,
 }: {
-  btcConnector: BtcConnector;
+  btcConnector: IBtcConnector;
   onWalletConnectStart: () => void;
 }) => {
   const globalFeeRate = useAtomValue(globalFeeRateAtom);
