@@ -117,7 +117,7 @@ const ProtocolList = () => {
     // 	network,
     // 	wallet: _wallet ?? undefined,
     // });
-    const _user = await btcConnector!.getUser({ network });
+    const _user = await btcConnector!.getUser({ network: environment.network });
 
     setUserInfo(_user);
   };
